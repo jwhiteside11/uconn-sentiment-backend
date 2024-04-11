@@ -1,4 +1,4 @@
-#!/use/bin/env bash
+#! /bin/bash
 
 name=$(uname -n)
 
