@@ -4,5 +4,3 @@ cd /
 mkdir startup
 
 cd startup/
-
-wget 
