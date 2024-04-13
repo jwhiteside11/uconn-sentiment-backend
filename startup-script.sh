@@ -5,6 +5,10 @@ name=$(uname -n)
 gcloud logging write production_log "${name}: New VM Created"
 
 cd /
-mkdir startup
+mkdir sentiment-data
 
-cd startup/
+cd sentiment-data/
+
+curl -H 'Cache-Control: no-cache, no-store' -o taskmanager.py https://raw.githubusercontent.com/ckury/uconn-sentiment-automation/main/taskmanager.py
+
+gcloud logging write production_log "${name}: taskmanager:" + $(python3 taskquerier.py get-task)
