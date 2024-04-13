@@ -2,7 +2,6 @@ import sys
 import yaml
 import warnings
 from google.cloud import datastore
-from google.cloud.datastore_v1 import PropertyFilter
 
 def getTaskForVM():
     client = datastore.Client()
