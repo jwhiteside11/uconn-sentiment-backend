@@ -21,3 +21,7 @@ curl -H 'Cache-Control: no-cache, no-store' -o taskmanager.py https://raw.github
 gcloud logging write production_log "${machinename}: Downloaded taskmanager"
 
 gcloud logging write production_log "${machinename}: taskmanager: $(python3 taskmanager.py get-task)"
+
+gcloud storage cp gs://production_upload_data_sentiment-analysis-379200/$(python3 taskmanager.py task-inputfile) input_file
+
+gcloud logging write production_log "${machinename}: Downloaded input file ${input_file}"
