@@ -39,3 +39,6 @@ if __name__ == "__main__":
 
     if option == "task-inputfile":
         print(getFromYAML("Input_File"))
+
+    if option == "task-keywordlocations":
+        print(getFromYAML("Keyword_List"))

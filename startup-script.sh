@@ -25,3 +25,7 @@ gcloud logging write production_log "${machinename}: taskmanager: $(python3 task
 gcloud storage cp gs://production_upload_data_sentiment-analysis-379200/$(python3 taskmanager.py task-inputfile) input_file
 
 gcloud logging write production_log "${machinename}: Downloaded input file ${input_file}"
+
+keywordlocations=$(python3 taskmanager.py task-keywordlocations)
+
+gcloud logging write production_log "${machinename}: Downloaded keywords as csv file $(python3 keywordcollector.py keywordlocations keywords.csv)"
