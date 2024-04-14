@@ -22,7 +22,8 @@ gcloud logging write production_log "${machinename}: Downloaded taskmanager"
 
 gcloud logging write production_log "${machinename}: taskmanager: $(python3 taskmanager.py get-task)"
 
-gcloud storage cp gs://production_upload_data_sentiment-analysis-379200/$(python3 taskmanager.py task-inputfile)/ input_files/
+mkdir input_files/
+gcloud storage cp gs://production_upload_data_sentiment-analysis-379200/Raw_CC/$(python3 taskmanager.py task-inputfile)/* input_files/
 
 gcloud logging write production_log "${machinename}: Downloaded inputs ${input_file}"
 
