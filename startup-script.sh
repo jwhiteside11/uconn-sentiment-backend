@@ -31,4 +31,4 @@ keywordlocations=$(python3 taskmanager.py task-keywordlocations)
 curl -H 'Cache-Control: no-cache, no-store' -o keywordcollector.py https://raw.githubusercontent.com/ckury/uconn-sentiment-automation/main/keywordcollector.py
 gcloud logging write production_log "${machinename}: Downloaded keywordcollector"
 
-gcloud logging write production_log "${machinename}: Downloaded keywords as csv file $(python3 keywordcollector.py keywordlocations keywords.csv)"
+gcloud logging write production_log "${machinename}: Downloaded keywords as csv file $(python3 keywordcollector.py ${keywordlocations} keywords.csv)"
