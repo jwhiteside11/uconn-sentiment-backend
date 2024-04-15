@@ -37,7 +37,11 @@ def score_CSV(scoring_location, keywords_location, output_location):
         quarter = str(get_quarter(int(month)))
 
         processed_df = process_transcript(input_df[input_df.columns[0]], keywords_df)
-        output_df = calculate_weighted_sentiment(processed_df, keywords_df)
+
+        try:
+            output_df = calculate_weighted_sentiment(processed_df, keywords_df)
+        except ValueError:
+            output_df = processed_df
 
         output_name = "Q" + quarter + year + ".csv"
 
