@@ -5,3 +5,4 @@ nltk==3.8.1
 scikit-learn==1.4.2
 openpyxl==3.1.2
 google-cloud-datastore==2.19.0
+beautifulsoup4==4.12.3
