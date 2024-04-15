@@ -22,19 +22,24 @@ def score_CSV(scoring_location, keywords_location, output_location):
         os.makedirs(output_location)
 
     for input_file_name in os.listdir(scoring_location):
-        input_df = pd.read_csv(scoring_location + '/' + input_file_name)
+        f = open(scoring_location + '/' + input_file_name)
+
+        input_df = pd.DataFrame([l.strip('\n') for l in f.readlines()])
+        print(input_df)
+        f.close()
+
 
         datelist = input_file_name.split('.')[0].split('_')
 
         year, month = datelist[0], datelist[1]
 
-        quarter = get_quarter(month)
+        quarter = str(get_quarter(int(month)))
 
-        output_df = process_transcript(input_df, keywords_df)
+        output_df = process_transcript(input_df[input_df.columns[0]], keywords_df)
 
-        output_name = quarter + year
+        output_name = "Q" + quarter + year + ".csv"
 
-        output_df.to_csv(output_location + '/' + output_name)
+        output_df.to_csv(output_location + '/' + output_name, index=False)
 
 def get_quarter(month):
     '''
