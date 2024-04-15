@@ -25,7 +25,7 @@ def score_CSV(scoring_location, keywords_location, output_location):
         f = open(scoring_location + '/' + input_file_name)
 
         input_df = pd.DataFrame([l.strip('\n') for l in f.readlines()])
-        print(input_df)
+
         f.close()
 
 
