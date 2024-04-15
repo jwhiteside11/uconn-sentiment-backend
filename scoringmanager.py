@@ -12,3 +12,12 @@ if __name__ == "__main__":
 
         for input in os.listdir(inputdir):
             extract_data(inputdir + '/' + input, outputdir + '/' + input.split(".")[0] + ".csv")
+
+    if option == "Score":
+        inputdir = args[0]
+        outputdir = args[1]
+        keyworddir = args[2]
+
+        for keywordfile in os.listdir(keyworddir):
+            keywordname = keywordfile.split('.')[0]
+            score_CSV(inputdir, keyworddir + '/' + keywordfile, outputdir + '/' + keywordname)
