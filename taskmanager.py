@@ -1,6 +1,5 @@
 import sys
 import yaml
-import warnings
 from google.cloud import datastore
 
 def getTaskForVM():
@@ -19,7 +18,7 @@ def getTaskForVM():
 
     client.put(task)
 
-    data = {"Id": task.key.id, "Kind": task.key.kind, "Input_File": task['Input_File'], "Keyword_List": task['Keyword_List'], "Yahoo_Ticker": task['Yahoo_Ticker']}
+    data = {"Id": task.key.id, "Kind": task.key.kind, "Input_File": task['Input_File'], "Keyword_List": task['Keyword_List'], "Yahoo_Ticker": task['Yahoo_Ticker'], "DateTime": task['DateTime']}
 
     with open("task.yaml", "w") as taskfile:
         taskfile.write(yaml.dump(data))
@@ -42,3 +41,9 @@ if __name__ == "__main__":
 
     if option == "task-keywordlocations":
         print(getFromYAML("Keyword_List"))
+
+    if option == "task-ticker":
+        print(getFromYAML("Yahoo_Ticker"))
+
+    if option == "task-datetime":
+        print(getFromYAML("DateTime"))
