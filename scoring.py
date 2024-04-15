@@ -6,6 +6,7 @@ from torch.nn.functional import softmax
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from nltk.tokenize import sent_tokenize
+from sklearn.preprocessing import MinMaxScaler
 
 # Required nltk files, only downloaded on first use
 nltk.download('vader_lexicon')
@@ -35,11 +36,45 @@ def score_CSV(scoring_location, keywords_location, output_location):
 
         quarter = str(get_quarter(int(month)))
 
-        output_df = process_transcript(input_df[input_df.columns[0]], keywords_df)
+        processed_df = process_transcript(input_df[input_df.columns[0]], keywords_df)
+        output_df = calculate_weighted_sentiment(processed_df, keywords_df)
 
         output_name = "Q" + quarter + year + ".csv"
 
         output_df.to_csv(output_location + '/' + output_name, index=False)
+
+def calculate_weighted_sentiment(sentiment_df, keywords_df):
+    '''
+    Args:
+        sentiment_filename: Name of Excel file with sentiment results for a transcript.
+                            Columns such as: 'Sentiment Score', 'Keyword', 'Paragraph' 
+
+        keywords_filename:  Name of Excel file with keywords and their weights (under 'Proposed').
+                            Must contain 'Weights'
+
+    Result:
+        Adds (at least) columns 'Proposed' and 'Weighted Sentiment Score' to 'sentiment_filename'.
+        'Weighted Sentiment Score' equals the original 'Sentiment Score' multiplied by 'Proposed' weight
+        for relevant 'Keyword', scaled to between 0 and 1.
+
+    Returns:
+        None
+    '''
+
+    # Merge the sentiment DataFrame with the keyword weights DataFrame and drop duplicate columns
+    sentiment_df = pd.merge(sentiment_df, keywords_df, left_on='Keyword', right_on='Keyword', how='left', 
+                            suffixes=('', '_DROP')).filter(regex='^(?!.*_DROP)')
+
+    # Calculate the proposed sentiment score using keyword weights
+    sentiment_df['Weighted Sentiment Score'] = sentiment_df['Sentiment Score'] * sentiment_df['Weight']
+
+    # Normalize the weighted sentiment score to be between 0 and 1
+    scaler = MinMaxScaler()
+    sentiment_df['Weighted Sentiment Score'] = scaler.fit_transform(sentiment_df[['Weighted Sentiment Score']])
+
+    # Save the DataFrame with the new column to the same Excel file
+    return sentiment_df
+
 
 def get_quarter(month):
     '''
