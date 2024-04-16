@@ -1,6 +1,6 @@
-import pandas as pd
 import sys
 import os
+import pandas as pd
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from torch.nn.functional import softmax
 import nltk
@@ -16,19 +16,15 @@ model = AutoModelForSequenceClassification.from_pretrained('ProsusAI/finBERT')
 tokenizer = AutoTokenizer.from_pretrained('ProsusAI/finBERT')
 sia = SentimentIntensityAnalyzer()
 
-def score_CSV(scoring_location, keywords_location, output_location):
+def score_csv(scoring_location, keywords_location, output_location):
     keywords_df = pd.read_csv(keywords_location)
 
     if not os.path.exists(output_location):
         os.makedirs(output_location)
 
     for input_file_name in os.listdir(scoring_location):
-        f = open(scoring_location + '/' + input_file_name)
-
-        input_df = pd.DataFrame([l.strip('\n') for l in f.readlines()])
-
-        f.close()
-
+        with open(scoring_location + '/' + input_file_name, encoding="utf-8") as f:
+            input_df = pd.DataFrame([l.strip('\n') for l in f.readlines()])
 
         datelist = input_file_name.split('.')[0].split('_')
 
@@ -58,15 +54,19 @@ def calculate_weighted_sentiment(sentiment_df, keywords_df):
 
     Result:
         Adds (at least) columns 'Proposed' and 'Weighted Sentiment Score' to 'sentiment_filename'.
-        'Weighted Sentiment Score' equals the original 'Sentiment Score' multiplied by 'Proposed' weight
-        for relevant 'Keyword', scaled to between 0 and 1.
+        'Weighted Sentiment Score' equals the original 'Sentiment Score' multiplied by 'Proposed' 
+        weight for relevant 'Keyword', scaled to between 0 and 1.
 
     Returns:
         None
     '''
 
     # Merge the sentiment DataFrame with the keyword weights DataFrame and drop duplicate columns
-    sentiment_df = pd.merge(sentiment_df, keywords_df, left_on='Keyword', right_on='Keyword', how='left', 
+    sentiment_df = pd.merge(sentiment_df,
+                            keywords_df,
+                            left_on='Keyword',
+                            right_on='Keyword',
+                            how='left',
                             suffixes=('', '_DROP')).filter(regex='^(?!.*_DROP)')
 
     # Calculate the proposed sentiment score using keyword weights
@@ -78,7 +78,6 @@ def calculate_weighted_sentiment(sentiment_df, keywords_df):
 
     # Save the DataFrame with the new column to the same Excel file
     return sentiment_df
-
 
 def get_quarter(month):
     '''
@@ -96,7 +95,7 @@ def get_quarter(month):
         return 3
     else:
         return 4
-    
+
 def process_transcript(transcript_df, keywords_df):
     '''
     Args:
@@ -109,7 +108,7 @@ def process_transcript(transcript_df, keywords_df):
     '''
     output_df = pd.DataFrame(columns=['Category', 'Keyword', 'Paragraph', 'Sentiment Score', 'Sentiment Magnitude'])
 
-    for index, row in keywords_df.iterrows():
+    for unused_index, row in keywords_df.iterrows():
         keyword = row['Keyword']
         category = row['Category']
 
@@ -121,8 +120,11 @@ def process_transcript(transcript_df, keywords_df):
             chunks = split_text(paragraph, 1024)
             for chunk in chunks:
                 sentiment_score, total_magnitude = process_chunk(chunk)
-                new_row = {'Category': category, 'Keyword': keyword, 'Paragraph': chunk, 
-                            'Sentiment Score': sentiment_score.item(), 'Sentiment Magnitude': total_magnitude}
+                new_row = { 'Category': category,
+                            'Keyword': keyword,
+                            'Paragraph': chunk,
+                            'Sentiment Score': sentiment_score.item(),
+                            'Sentiment Magnitude': total_magnitude}
                 output_df = pd.concat([output_df, pd.DataFrame([new_row])], ignore_index=True)
 
     return output_df
@@ -139,14 +141,14 @@ def process_chunk(chunk):
     '''
     probabilities = analyze_sentiment(chunk)
     sentiment_score = (probabilities[1] + (probabilities[2] * 2) + (probabilities[0] * 3)) - 2
-    
+
     sentences = sent_tokenize(chunk)
     magnitudes = []
     for sentence in sentences:
         sentence_magnitude = abs(sia.polarity_scores(sentence)['compound'])
         magnitudes.append(sentence_magnitude)
     total_magnitude = sum(magnitudes)
-    
+
     return sentiment_score, total_magnitude
 
 def analyze_sentiment(text):
@@ -175,8 +177,8 @@ def split_text(text, chunk_size):
     return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
 
 if __name__ == "__main__":
-    scoring_location = sys.argv[1]
-    keywords_location = sys.argv[2]
-    output_location = sys.argv[3]
+    scoring_input = sys.argv[1]
+    keywords_input = sys.argv[2]
+    output_input = sys.argv[3]
 
-    score_CSV(scoring_location, keywords_location, output_location)
+    score_csv(scoring_input, keywords_input, output_input)
