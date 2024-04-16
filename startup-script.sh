@@ -6,6 +6,9 @@ gcloud logging write production_log "${machinename}: New VM Created"
 
 curl -H 'Cache-Control: no-cache, no-store' -o shutdown-script.sh https://raw.githubusercontent.com/ckury/uconn-sentiment-automation/main/shutdown-script.sh
 
+curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
+bash add-google-cloud-ops-agent-repo.sh --also-install
+
 cd /
 mkdir sentiment-data
 
