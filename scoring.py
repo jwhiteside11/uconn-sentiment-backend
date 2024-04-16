@@ -61,6 +61,13 @@ def calculate_weighted_sentiment(sentiment_df, keywords_df):
         None
     '''
 
+    weightMap = {}
+
+    for unused_index, row in keywords_df.iterrows():
+        weightMap[row['Keyword']] = row['Weight']
+
+    keywords_df['Weight'] = keywords_df['Proposed'].map(weightMap)
+
     # Merge the sentiment DataFrame with the keyword weights DataFrame and drop duplicate columns
     sentiment_df = pd.merge(sentiment_df,
                             keywords_df,
@@ -68,6 +75,8 @@ def calculate_weighted_sentiment(sentiment_df, keywords_df):
                             right_on='Keyword',
                             how='left',
                             suffixes=('', '_DROP')).filter(regex='^(?!.*_DROP)')
+    
+
 
     # Calculate the proposed sentiment score using keyword weights
     sentiment_df['Weighted Sentiment Score'] = sentiment_df['Sentiment Score'] * sentiment_df['Weight']
