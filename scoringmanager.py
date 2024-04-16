@@ -1,4 +1,4 @@
-from scoring import score_CSV
+from scoring import score_csv
 from HTMLtoCSV import extract_data
 import sys, os
 
@@ -20,4 +20,8 @@ if __name__ == "__main__":
 
         for keywordfile in os.listdir(keyworddir):
             keywordname = keywordfile.split('.')[0]
-            score_CSV(inputdir, keyworddir + '/' + keywordfile, outputdir + '/' + keywordname)
+            score_csv(inputdir, keyworddir + '/' + keywordfile, outputdir + '/' + keywordname)
+
+    if option == "Summarize":
+        inputdir = args[0]
+        outputdir = args[1]
