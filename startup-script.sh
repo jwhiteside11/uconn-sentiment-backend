@@ -4,7 +4,7 @@ machinename=$(uname -n)
 
 gcloud logging write production_log "${machinename}: New VM Created"
 
-curl -H 'Cache-Control: no-cache, no-store' -o shutdown-script.sh https://raw.githubusercontent.com/ckury/uconn-sentiment-automation/main/shutdown-script.sh
+curl -H 'Cache-Control: no-cache, no-store' -o shutdown-script.sh https://raw.githubusercontent.com/ckury/uconn-sentiment-backend/main/shutdown-script.sh
 
 curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
 bash add-google-cloud-ops-agent-repo.sh --also-install
@@ -17,12 +17,12 @@ cd sentiment-data/
 apt install -y python3-pip
 gcloud logging write production_log "${machinename}: Installed pip"
 
-curl -H 'Cache-Control: no-cache, no-store' -o requirements.txt https://raw.githubusercontent.com/ckury/uconn-sentiment-automation/main/requirements.txt
+curl -H 'Cache-Control: no-cache, no-store' -o requirements.txt https://raw.githubusercontent.com/ckury/uconn-sentiment-backend/main/requirements.txt
 gcloud logging write production_log "${machinename}: Downloaded requirements.txt"
 
 python3 -m pip install -r requirements.txt --break-system-packages
 
-curl -H 'Cache-Control: no-cache, no-store' -o taskmanager.py https://raw.githubusercontent.com/ckury/uconn-sentiment-automation/main/taskmanager.py
+curl -H 'Cache-Control: no-cache, no-store' -o taskmanager.py https://raw.githubusercontent.com/ckury/uconn-sentiment-backend/main/taskmanager.py
 gcloud logging write production_log "${machinename}: Downloaded taskmanager"
 
 gcloud logging write production_log "${machinename}: taskmanager: $(python3 taskmanager.py get-task)"
@@ -36,7 +36,7 @@ keywordlocations=$(python3 taskmanager.py task-keywordlocations)
 ticker=$(python3 taskmanager.py task-ticker)
 datetime=$(python3 taskmanager.py task-datetime)
 
-curl -H 'Cache-Control: no-cache, no-store' -o keywordcollector.py https://raw.githubusercontent.com/ckury/uconn-sentiment-automation/main/keywordcollector.py
+curl -H 'Cache-Control: no-cache, no-store' -o keywordcollector.py https://raw.githubusercontent.com/ckury/uconn-sentiment-backend/main/keywordcollector.py
 gcloud logging write production_log "${machinename}: Downloaded keywordcollector"
 
 mkdir keywords/
