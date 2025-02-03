@@ -2,6 +2,7 @@ import subprocess
 import requests
 from bs4 import BeautifulSoup
 from typing import List, Dict, Tuple
+import pandas as pd
 import datetime
 import time
 import os
@@ -60,27 +61,31 @@ Scrape earning calls for the past 8 quarters for the specified ticker
 
 Output: dict object mapping (year, quarter) keyed lists of paragraphs
 Example usage:
-  earnings_dict = scrape_earnings("MSFT")
+  earnings_dict = save_earnings_calls("MSFT")
 '''
 def save_earnings_calls(ticker: str) -> Dict[Tuple[str, str], List[str]]:
   past8q = get_past_8_quarters()
   
+  [[firsty, firstq], [lasty, lastq]] = [past8q[-1], past8q[0]]
+  file_path = f'earnings-call-{ticker}-{firsty}Q{firstq}-{lasty}Q{lastq}.xlsx'
+
+  dfs = []
+  i = 0
   for (year, quarter) in past8q:
     res = earnings_calls(ticker, year, quarter)
-    file_path = f'earnings-call-{ticker}-{year}-Q{quarter}.txt'
-
-    # write paragraphs to local file
-    with open(file_path, 'w') as f:
-      f.write('\n'.join(res))
-
-    # copy local file to google cloud
-    subprocess.run(["gcloud", "storage", "cp", f"{file_path}", "gs://earnings-calls-raw/"])
-
-    # remove local file
-    os.remove(file_path)
-
+    dfs.append(pd.DataFrame({f"{year} Q{quarter}" : res}))
     # sleep to avoid rate limiting
     time.sleep(2)
+
+  df = pd.concat(dfs, axis=1, join='outer')
+  # write dataframe to local file
+  df.to_excel(file_path)
+
+  # copy local file to google cloud
+  subprocess.run(["gcloud", "storage", "cp", f"{file_path}", "gs://earnings-calls-raw/"])
+
+  # remove local file
+  os.remove(file_path)
 
 
 
