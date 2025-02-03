@@ -1,7 +1,10 @@
+import subprocess
 import requests
 from bs4 import BeautifulSoup
 from typing import List, Dict, Tuple
 import datetime
+import time
+import os
 
 
 def get_as_browser(url):
@@ -38,7 +41,7 @@ Output: paragraphs from the specified earnings call
 Example usage:
   p_res = earnings("MSFT", year=2025, quarter=1)
 '''
-def earnings(ticker: str, year: int, quarter: int) -> List[str]:
+def earnings_calls(ticker: str, year: int, quarter: int) -> List[str]:
   source = get_as_browser(f"https://www.roic.ai/quote/{ticker}/transcripts/{year}-year/{quarter}-quarter")
   if source.status_code != 200:
     print("ERROR:", source)
@@ -49,32 +52,41 @@ def earnings(ticker: str, year: int, quarter: int) -> List[str]:
   soup = BeautifulSoup(html_content, features="html.parser")
   # select paragraphs of relevant text using CSS selector
   paragraphs = soup.select('p.pb-4')
-  return paragraphs
+  return [p.get_text() for p in paragraphs]
 
 
 '''
-Scrape earning calls for the past 8 quarters for the specified tickers
+Scrape earning calls for the past 8 quarters for the specified ticker
 
-Output: dict object mapping tickers to a dict of (year, quarter) keyed lists of paragraphs
+Output: dict object mapping (year, quarter) keyed lists of paragraphs
 Example usage:
-  earnings_dict = scrape_earnings(["MSFT", "APPL", "YHOO"])
+  earnings_dict = scrape_earnings("MSFT")
 '''
-def scrape_earnings(tickers: List[str]) -> Dict[str, Dict[Tuple[str, str], List[str]]]:
+def save_earnings_calls(ticker: str) -> Dict[Tuple[str, str], List[str]]:
   past8q = get_past_8_quarters()
   
-  res = {}
-  for ticker in tickers:
-    res[ticker] = {}
-    for (year, quarter) in past8q:
-      res[ticker][(year, quarter)] = earnings(ticker, year, quarter)
-  
-  return res
+  for (year, quarter) in past8q:
+    res = earnings_calls(ticker, year, quarter)
+    file_path = f'earnings-call-{ticker}-{year}-Q{quarter}.txt'
+
+    # write paragraphs to local file
+    with open(file_path, 'w') as f:
+      f.write('\n'.join(res))
+
+    # copy local file to google cloud
+    subprocess.run(["gcloud", "storage", "cp", f"{file_path}", "gs://earnings-calls-raw/"])
+
+    # remove local file
+    os.remove(file_path)
+
+    # sleep to avoid rate limiting
+    time.sleep(2)
 
 
 
 # driver for running in production
 def run_program():
-  pass
+  save_earnings_calls("MSFT")
 
 # driver for testing different functions
 def test_program():
