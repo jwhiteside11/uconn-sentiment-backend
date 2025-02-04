@@ -70,7 +70,6 @@ def save_earnings_calls(ticker: str) -> Dict[Tuple[str, str], List[str]]:
   file_path = f'earnings-call-{ticker}-{firsty}Q{firstq}-{lasty}Q{lastq}.xlsx'
 
   dfs = []
-  i = 0
   for (year, quarter) in past8q:
     res = earnings_calls(ticker, year, quarter)
     dfs.append(pd.DataFrame({f"{year} Q{quarter}" : res}))
@@ -91,7 +90,7 @@ def save_earnings_calls(ticker: str) -> Dict[Tuple[str, str], List[str]]:
 
 # driver for running in production
 def run_program():
-  save_earnings_calls("MSFT")
+  save_earnings_calls("INTU")
 
 # driver for testing different functions
 def test_program():
