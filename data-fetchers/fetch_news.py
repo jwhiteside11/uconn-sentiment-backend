@@ -27,29 +27,13 @@ def get_article_urls(ticker: str, year: int, quarter: int) -> List[str]:
   [start_date, end_date] = fetch_utils.get_date_bounds(year, quarter)
   num_articles = 10
   # create Google search query for Yahoo Finance news about the ticker symbol
-  source = fetch_utils.get_as_browser(f"https://www.google.com/search?q=yahoo+finance+{ticker}&tbs=cdr:1,cd_min:{start_date},cd_max:{end_date}&tbm=nws&num={num_articles}&rls=en")
-  if source.status_code != 200:
-    print("Error:", source.status_code, source.text)
-    return
-  
-  # parse successful response
-  html_content = source.text
-  soup = BeautifulSoup(html_content, features="html.parser")
+  s_driver.get(f"https://www.google.com/search?q=yahoo+finance+{ticker}&tbs=cdr:1,cd_min:{start_date},cd_max:{end_date}&tbm=nws&num={num_articles}&rls=en")
 
   # select links of relevant text using <a> tag, filter yahoo news URLs
-  links_elems = soup.find_all('a')
-  urls = [elem.attrs['href'] for elem in links_elems]
+  links_elems = s_driver.wait_all_then_get(By.TAG_NAME, 'a')
+  urls = [elem.get_attribute('href') for elem in links_elems]
 
-  results = []
-  # hrefs in results are actually relative paths of format /url?p1=xxx&p2=...&url=<DATA_OF_INTEREST>&...
-  # extract url of interest
-  for url in urls:
-    if 'finance.yahoo.com' not in url:
-      continue
-    start_ind = url.find("url=")
-    results.append(url[start_ind + 4: url.find("&", start_ind)])
-
-  return results
+  return [url for url in urls if url and 'finance.yahoo.com' in url]
 
 
 '''
@@ -60,32 +44,26 @@ Example usage:
   news_res = scrape_news_story("https://finance.yahoo.com/...")
 '''
 def scrape_news_story(url: str):
-  # use selenium to simulate browser environment; screen dim 700x820
-  s_driver.get(url)
+  source = fetch_utils.get_as_browser(url)
+  if source.status_code != 200:
+    print("Error:", source.status_code, source.text)
+    return []
 
-  # see if paywall exists OR if we need to hit readmore button to access full article
-  paywall_found = s_driver.wait_present(By.CLASS_NAME, "continue-reading", 10)
-  if paywall_found:
-    return None
-
-  # if there is no paywall, check for readmore button; click if present
-  try:
-    s_driver.wait_then_click_elem(By.CLASS_NAME, "readmore-button", 1)
-    time.sleep(1)
-  except:
-    pass
+  # parse successful response
+  html_content = source.text
+  soup = BeautifulSoup(html_content, features="html.parser")
 
   # fetch relevant info: {title, date, text}
-  title = s_driver.wait_present_then_do(By.CLASS_NAME, "cover-title", timeout=1).text
-  date = s_driver.wait_present_then_do(By.CLASS_NAME, "byline-attr-meta-time", timeout=1).text
-  article_body = s_driver.wait_present_then_do(By.CLASS_NAME, "body-wrap", timeout=1)
-  paragraphs = article_body.find_elements(By.TAG_NAME, "p")
+  title = soup.select_one(".cover-title").get_text()
+  date = soup.select_one(".byline-attr-meta-time").get_text()
+  article_body = soup.select_one(".body-wrap")
+  paragraphs = article_body.find_all("p")
 
   return {
     "url": url, 
     "title": title, 
     "date": date, 
-    "paragraphs": [p.text for p in paragraphs]
+    "paragraphs": [p.get_text().replace('\xa0', ' ') for p in paragraphs]
   }
 
 
@@ -95,20 +73,16 @@ Scrape 10 news stories from specified quarter for the specified ticker, save to 
 Example usage:
   save_news_stories("MSFT", 2024, 3)
 '''
-def save_news_stories(ticker: str, year: int, quarter: int) -> Dict[Tuple[str, str], List[str]]:
+def save_news_stories(ticker: str, year: int, quarter: int):
   file_path = f'news-article-{ticker}-{year}Q{quarter}.xlsx'
   
   dfs = []
   urls = get_article_urls(ticker, year, quarter)
 
   for url in urls:
-    try:
-      res = scrape_news_story(url)
+    res = scrape_news_story(url)
+    if res:
       dfs.append(pd.DataFrame({res['date'] : [res['title'], res['url'], *(p for p in res['paragraphs'])]}))
-    except Exception as e:
-      # catch WebDriverWait exceptions coming from selenium
-      print(e)
-      print('failed:', url)
     # sleep to avoid rate limiting
     time.sleep(2)
 
@@ -125,11 +99,11 @@ def save_news_stories(ticker: str, year: int, quarter: int) -> Dict[Tuple[str, s
 
 # driver for running in production
 def run_program():
-  save_news_stories("MSFT", 2024, 4)
+  save_news_stories("MSFT", 2024, 2)
 
 # driver for testing different functions
 def test_program():
-  u = get_article_urls("MSFT", 2024, 4)
+  u = get_article_urls("MSFT", 2024, 3)
   print(u)
 
 
