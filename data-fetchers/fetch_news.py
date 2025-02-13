@@ -57,7 +57,7 @@ Scrape Yahoo Finance news story at specified URL for content of article
 
 Output: dict representing news story info
 Example usage:
-  news_res = news_stories("MSFT", year=2025, quarter=1)
+  news_res = scrape_news_story("https://finance.yahoo.com/...")
 '''
 def scrape_news_story(url: str):
   # use selenium to simulate browser environment; screen dim 700x820
@@ -78,7 +78,7 @@ def scrape_news_story(url: str):
   # fetch relevant info: {title, date, text}
   title = s_driver.wait_present_then_do(By.CLASS_NAME, "cover-title", timeout=1).text
   date = s_driver.wait_present_then_do(By.CLASS_NAME, "byline-attr-meta-time", timeout=1).text
-  article_body = s_driver.wait_present_then_do(By.CLASS_NAME, "body-wrap", lambda x: x, 1)
+  article_body = s_driver.wait_present_then_do(By.CLASS_NAME, "body-wrap", timeout=1)
   paragraphs = article_body.find_elements(By.TAG_NAME, "p")
 
   return {
