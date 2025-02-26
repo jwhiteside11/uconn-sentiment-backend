@@ -34,6 +34,13 @@ class DatastoreClient:
         query.keys_only()
         query.add_filter(filter=datastore.query.PropertyFilter('ticker', '=', ticker))
         return [entity.key.id_or_name for entity in query.fetch()]
+    
+
+    def getAllNewsDocs(self, ticker: str) -> NewsDocument:
+        ids = self.getAllNewsDocIDs(ticker)
+        keys = [self.client.key("newsJDWpoc", id) for id in ids]
+        stories = self.client.get_multi(keys)
+        return [NewsDocument(**{pair[0]: pair[1] for pair in story.items()}) for story in stories]
 
 
 def run_program():

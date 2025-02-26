@@ -1,0 +1,6 @@
+beautifulsoup4==4.13.3
+pandas==2.2.3
+protobuf==5.29.3
+Requests==2.32.3
+selenium==4.29.0
+typesense==0.21.0
