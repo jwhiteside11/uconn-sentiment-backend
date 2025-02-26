@@ -1,4 +1,4 @@
-FROM --platform=linux/arm64/v8 python:3.9-buster
+FROM --platform=linux/amd64 python:3.9-buster
  
 # install google chrome
  
