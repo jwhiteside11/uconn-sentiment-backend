@@ -16,7 +16,7 @@ class TypesenseClient:
         self.client = typesense.Client({
             'api_key': 'Hu52dwsas2AdxdE',
             'nodes': [{
-                'host': 'localhost',
+                'host': 'host.docker.internal',
                 'port': '8108',
                 'protocol': 'http'
             }],
@@ -38,7 +38,7 @@ class TypesenseClient:
     def createNewsDocument(self, news_doc: NewsDocument):
         self.client.collections['news'].documents.create(news_doc.__dict__)
 
-    def searchNews(self, ticker, search_term):
+    def searchNews(self, ticker: str, search_term: str):
         search_parameters = {
             'q'         : search_term,
             'query_by'  : 'paragraphs',
