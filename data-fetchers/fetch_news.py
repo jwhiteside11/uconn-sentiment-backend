@@ -4,6 +4,7 @@ from typing import List, Dict, Tuple
 import pandas as pd
 import time
 import os
+from datastore_client import DatastoreClient, NewsDocument
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -97,9 +98,23 @@ def save_news_stories(ticker: str, year: int, quarter: int):
   os.remove(file_path)
 
 
+def save_news_stories_to_datastore(ticker: str, year: int, quarter: int):
+  ds = DatastoreClient()
+
+  urls = get_article_urls(ticker, year, quarter)
+
+  for url in urls:
+    res = scrape_news_story(url)
+    if res:
+      news_doc = NewsDocument(ticker, **res)
+      ds.createNewsStoryEntity(news_doc)
+    # sleep to avoid rate limiting
+    time.sleep(2)
+
+
 # driver for running in production
 def run_program():
-  save_news_stories("MSFT", 2024, 2)
+  save_news_stories_to_datastore("WBS", 2024, 2)
 
 # driver for testing different functions
 def test_program():
@@ -109,5 +124,5 @@ def test_program():
 
 # main driver
 if __name__ == "__main__":
-  test_program()
-  # run_program()
+  # test_program()
+  run_program()
