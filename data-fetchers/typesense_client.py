@@ -1,6 +1,6 @@
 import typesense
 import json
-import time
+import sys
 
 class NewsDocument:
     def __init__(self, ticker, date, title, url, paragraphs):
@@ -51,10 +51,15 @@ class TypesenseClient:
     def deleteNewsColletion(self):
         self.client.collections['news'].delete()
         
+def run_program(ticker, search_term):
+    # Create client
+    ts = TypesenseClient()
 
+    # Search documents
+    res = ts.searchNews(ticker, search_term)
+    print(res)
 
-
-if __name__ == "__main__":
+def test_program():
     # 1) Create client
     ts = TypesenseClient()
 
@@ -96,3 +101,11 @@ if __name__ == "__main__":
     # 4) Search documents
     res = ts.searchNews("WBS", "AI")
     print(res)
+
+
+
+if __name__ == "__main__":
+    ticker = sys.argv[1]
+    search_term = sys.argv[2]
+
+    run_program(ticker, search_term)

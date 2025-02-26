@@ -10,7 +10,7 @@ from typing import List, Tuple
 
 # use headers to mock authentic browser User-Agent in requests HTTP call
 def get_as_browser(url):
-  headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+  headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0'}
   return requests.get(url, headers=headers)
 
 def get_current_quarter() -> Tuple[int, int]:
