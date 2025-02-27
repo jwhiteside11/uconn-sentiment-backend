@@ -45,8 +45,14 @@ class TypesenseClient:
             'filter_by' : f'ticker:={ticker}'
         }
 
-        res = self.client.collections['news'].documents.search(search_parameters)
-        return json.dumps(res, indent=4)
+        try:
+            res = self.client.collections['news'].documents.search(search_parameters)
+            condensed = {"num_hits": res["found"], "hits": [
+                {"title": hit["document"]["title"], "highlights": hit["highlight"]["paragraphs"]} for hit in res["hits"]
+            ]}
+            return json.dumps(condensed)
+        except Exception as e:
+            return json.dumps({"message": f"error: {e}"}, indent=4)
 
     def deleteNewsColletion(self):
         return self.client.collections['news'].delete()

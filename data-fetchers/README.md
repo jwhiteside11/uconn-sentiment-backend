@@ -8,6 +8,7 @@ This subfolder holds all of the code to:
 The code is designed to run on the Compute Engine VM. This subfolder uses Docker to containerize different parts of the application. We will have one container for the Typesense server, and one for the Python code herein.
 
 # Quick start
+
 First, SSH into the VM.
 
 From there, pull the code into the VM.
@@ -35,7 +36,7 @@ Then, we must pull the Typesense image, and run it on our VM.
 ```bash
 sudo docker pull typesense/typesense:28.0
 
-tmux new-session -A -t "typesense"
+tmux new-session -A -t typesense
 
 # from tmux session
 docker run -p 8108:8108 -v/tmp/data:/data typesense/typesense:28.0 --data-dir /data --api-key=Hu52dwsas2AdxdE
@@ -51,7 +52,7 @@ sudo docker build --tag fetch_server .
 tmux new-session -A -t fetch_server
 
 # from tmux session
-sudo docker run -p 5000:5000 fetch_server
+sudo docker run --add-host=host.docker.internal:host-gateway -p 5000:5000 fetch_server
 # (Ctrl + B) + D
 ```
 
