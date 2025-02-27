@@ -8,13 +8,16 @@ class Fetcher:
     self.ts = TypesenseClient()
 
   def scrape_news(self, ticker: str):
-    fetch_news.save_news_stories_to_datastore(ticker, 2024, 4)
+    return fetch_news.save_news_stories_to_datastore(ticker, 2024, 4)
 
   def get_news(self, ticker: str):
-    self.ds.getAllNewsDocs(ticker)
+    return self.ds.getAllNewsDocs(ticker)
 
   def search_news(self, ticker: str, search_term: str):
-    self.ts.searchNews(ticker, search_term)
+    return self.ts.searchNews(ticker, search_term)
 
   def initTypesenseServer(self):
-    self.ts.createNewsCollection()
+    try:
+      self.ts.createNewsCollection()
+    except:
+      pass
