@@ -12,6 +12,13 @@ def hello_world():
     return jsonify(message="Hello, World!")
 
 # Search news using Typesense
+@app.route('/backfill_typesense', methods=['GET'])
+def backfill():
+    ticker = request.args.get("ticker")
+    res = fetcher.backfillTypesenseServer(ticker)
+    return jsonify(res)
+
+# Search news using Typesense
 @app.route('/search', methods=['GET'])
 def search():
     ticker = request.args.get("ticker")

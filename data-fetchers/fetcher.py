@@ -16,6 +16,12 @@ class Fetcher:
   def search_news(self, ticker: str, search_term: str):
     return self.ts.searchNews(ticker, search_term)
 
+  def backfillTypesenseServer(self, ticker: str):
+    docs = self.ds.getAllNewsDocs(ticker)
+    for doc in docs:
+      self.ts.createNewsDocument(doc)
+    
+
   def initTypesenseServer(self):
     try:
       self.ts.createNewsCollection()
