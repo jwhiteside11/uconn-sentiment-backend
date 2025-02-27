@@ -10,7 +10,7 @@ class DatastoreClient:
         query = self.client.query(kind="newsJDWpoc")
         query.keys_only()
         query.add_filter(filter=datastore.query.PropertyFilter('url', '=', url))
-        return len(query.fetch()) > 0
+        return query.fetch().num_results > 0
     
     def createNewsStoryEntity(self, news_doc: NewsDocument, id: str = ""):
         # if news story with same url exists, don't replicate
