@@ -48,7 +48,7 @@ class TypesenseClient:
         try:
             res = self.client.collections['news'].documents.search(search_parameters)
             condensed = {"num_hits": res["found"], "hits": [
-                {"title": hit["document"]["title"], "highlights": hit["highlight"]["paragraphs"]} for hit in res["hits"]
+                {"title": hit["document"]["title"], "highlights": [p for p in hit["highlight"]["paragraphs"] if len(p["matched_tokens"]) > 0]} for hit in res["hits"]
             ]}
             return json.dumps(condensed)
         except Exception as e:

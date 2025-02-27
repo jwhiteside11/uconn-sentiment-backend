@@ -39,7 +39,7 @@ sudo docker pull typesense/typesense:28.0
 tmux new-session -A -t typesense
 
 # from tmux session
-docker run -p 8108:8108 -v/tmp/data:/data typesense/typesense:28.0 --data-dir /data --api-key=Hu52dwsas2AdxdE
+sudo docker run -p 8108:8108 -v/tmp/data:/data typesense/typesense:28.0 --data-dir /data --api-key=Hu52dwsas2AdxdE
 # (Ctrl + B) + D
 ```
 
