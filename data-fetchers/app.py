@@ -5,6 +5,8 @@ fetcher = Fetcher()
 
 app = Flask(__name__)
 
+fetcher.initTypesenseServer()
+
 @app.route('/')
 def hello_world():
     return jsonify(message="Hello, World!")

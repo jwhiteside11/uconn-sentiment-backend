@@ -15,3 +15,6 @@ class Fetcher:
 
   def search_news(self, ticker: str, search_term: str):
     self.ts.searchNews(ticker, search_term)
+
+  def initTypesenseServer(self):
+    self.ts.createNewsCollection()
