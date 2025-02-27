@@ -9,6 +9,9 @@ class Fetcher:
 
   def scrape_news(self, ticker: str):
     return fetch_news.save_news_stories_to_datastore(ticker, 2024, 4)
+  
+  def scrape_earnings_calls(self, ticker: str):
+    return None
 
   def get_news(self, ticker: str):
     return self.ds.getAllNewsDocs(ticker)

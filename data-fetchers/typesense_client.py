@@ -36,7 +36,7 @@ class TypesenseClient:
         })
 
     def createNewsDocument(self, news_doc: NewsDocument):
-        self.client.collections['news'].documents.create(news_doc.__dict__)
+        return self.client.collections['news'].documents.create(news_doc.__dict__)
 
     def searchNews(self, ticker: str, search_term: str):
         search_parameters = {
@@ -49,8 +49,10 @@ class TypesenseClient:
         return json.dumps(res, indent=4)
 
     def deleteNewsColletion(self):
-        self.client.collections['news'].delete()
+        return self.client.collections['news'].delete()
         
+
+
 def run_program(ticker, search_term):
     # Create client
     ts = TypesenseClient()
