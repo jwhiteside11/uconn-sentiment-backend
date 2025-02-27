@@ -34,11 +34,11 @@ To run these containers on our VM at the same time, we will use the shell comman
 
 Then, we must pull the Typesense image, and run it on our VM. 
 ```bash
-sudo docker pull typesense/typesense:28.0
-
 tmux new-session -A -t typesense
 
 # from tmux session
+sudo docker pull typesense/typesense:28.0
+
 sudo docker run -p 8108:8108 -v/tmp/data:/data typesense/typesense:28.0 --data-dir /data --api-key=Hu52dwsas2AdxdE
 # (Ctrl + B) + D
 ```
@@ -47,11 +47,11 @@ Now, Typesense is up and running in a container, and accessible via HTTP.
 
 We are going to do pretty much the same for the Python code we wrote, this time using a local Dockerfile.
 ```bash
-sudo docker build --tag fetch_server .
-
 tmux new-session -A -t fetch_server
 
 # from tmux session
+sudo docker build --tag fetch_server .
+
 sudo docker run --add-host=host.docker.internal:host-gateway -p 5000:5000 fetch_server
 # (Ctrl + B) + D
 ```
