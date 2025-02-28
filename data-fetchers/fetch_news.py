@@ -134,11 +134,11 @@ def save_news_stories_to_datastore(ticker: str, year: int, quarter: int):
 
 # driver for running in production
 def run_program():
-  save_news_stories_to_datastore("WBS", "Webster Financial Corporation", 2025, 1)
+  save_news_stories_to_datastore("WBS", 2025, 1)
 
 # driver for testing different functions
 def test_program():
-  u = get_article_urls("MSFT", "Microsoft", 2024, 3)
+  u = get_article_urls("MSFT", 2024, 3)
   print(u)
 
 

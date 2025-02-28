@@ -18,9 +18,9 @@ class DatastoreClient:
             return
         
         if id:
-            story = datastore.Entity(self.client.key("newsJDWpoc", id))
+            story = datastore.Entity(self.client.key("newsJDWpoc", id), exclude_from_indexes=("paragraphs",))
         else:
-            story = datastore.Entity(self.client.key("newsJDWpoc"))
+            story = datastore.Entity(self.client.key("newsJDWpoc"), exclude_from_indexes=("paragraphs",))
         story.update(news_doc.__dict__)
         self.client.put(story)
 
@@ -29,10 +29,11 @@ class DatastoreClient:
         story = self.client.get(key)
         return NewsDocument(**{pair[0]: pair[1] for pair in story.items()})
 
-    def getAllNewsDocIDs(self, ticker: str) -> NewsDocument:
+    def getAllNewsDocIDs(self, ticker: str = "") -> NewsDocument:
         query = self.client.query(kind="newsJDWpoc")
         query.keys_only()
-        query.add_filter(filter=datastore.query.PropertyFilter('ticker', '=', ticker))
+        if ticker:
+            query.add_filter(filter=datastore.query.PropertyFilter('ticker', '=', ticker))
         return [entity.key.id_or_name for entity in query.fetch()]
     
 

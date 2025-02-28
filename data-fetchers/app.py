@@ -22,8 +22,8 @@ def backfill():
 
 
 # Search news using Typesense
-@app.route('/search', methods=['GET'])
-def search():
+@app.route('/search_news', methods=['GET'])
+def search_news():
     ticker = request.args.get("ticker")
     search_term = request.args.get("search_term")
     res = fetcher.search_news(ticker, search_term)

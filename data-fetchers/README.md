@@ -63,7 +63,7 @@ Everything is now up and running. Test the server using the `Hello world!` examp
 curl 'localhost:5000/'
 ```
 
-**Note:** each time the Typesense server is restarted, it must be backfilled with the news we've scraped into datastore. There is and endpoint for doing so.
+**Note:** each time the Typesense server is restarted, it must be backfilled with the news we've scraped into datastore. There is an endpoint for doing so.
 ```bash
 curl 'localhost:5000/backfill_typesense'
 ```
@@ -73,7 +73,7 @@ curl 'localhost:5000/backfill_typesense'
 # API reference
 This code is wrapped with a Flask server. Interact with this code base using HTTP calls to `localhost:5000`. 
 
-In the examples below, I use the `curl` shell command, but you can interface with the containers any HTTP library in any language.
+In the examples above, I use the `curl` shell command, but you can interface with the containers any HTTP library in any language.
 
 ## Endpoints
 
