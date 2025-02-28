@@ -29,7 +29,7 @@ class DatastoreClient:
         story = self.client.get(key)
         return NewsDocument(**{pair[0]: pair[1] for pair in story.items()})
 
-    def getAllNewsDocIDs(self, ticker: str = "") -> NewsDocument:
+    def getAllNewsDocIDs(self, ticker: str) -> NewsDocument:
         query = self.client.query(kind="newsJDWpoc")
         query.keys_only()
         if ticker:
@@ -37,7 +37,7 @@ class DatastoreClient:
         return [entity.key.id_or_name for entity in query.fetch()]
     
 
-    def getAllNewsDocs(self, ticker: str) -> NewsDocument:
+    def getAllNewsDocs(self, ticker: str = "") -> NewsDocument:
         ids = self.getAllNewsDocIDs(ticker)
         keys = [self.client.key("newsJDWpoc", id) for id in ids]
         stories = self.client.get_multi(keys)
