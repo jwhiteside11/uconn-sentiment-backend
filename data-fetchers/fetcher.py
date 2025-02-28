@@ -19,13 +19,17 @@ class Fetcher:
   def search_news(self, ticker: str, search_term: str):
     return self.ts.searchNews(ticker, search_term)
 
-  def backfillTypesenseServer(self, ticker: str):
+  def backfillTypesenseServer(self, ticker: str = ""):
     self.ts.deleteNewsColletion()
     self.ts.createNewsCollection()
 
-    docs = self.ds.getAllNewsDocs()
+    docs = self.ds.getAllNewsDocs(ticker)
     for doc in docs:
-      self.ts.createNewsDocument(doc)
+      try:
+        self.ts.createNewsDocument(doc)
+        print("added: ", doc.id)
+      except Exception as e:
+        print("failed: ", doc.id)
     
   def initTypesenseServer(self):
     try:
