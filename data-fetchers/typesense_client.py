@@ -3,12 +3,12 @@ import json
 import sys
 
 class NewsDocument:
-    def __init__(self, ticker, date, title, url, paragraphs):
+    def __init__(self, ticker, date, title, url, paragraphs, id = ""):
         self.ticker = ticker
         self.date = date
         self.title = title
         self.url = url
-        self.id = url
+        self.id = id if id else url
         self.paragraphs = paragraphs
 
 
