@@ -135,7 +135,9 @@ Backfill Typesense server with news articles from Datastore.
 - **URL**: `/backfill_typesense`
 
 #### Query Parameters
-None
+| Parameter    | Type   | Description                        |
+|--------------|--------|------------------------------------|
+| `ticker`       | str    | The ticker of the company of interest (optional; if not provided, evrey news document in the Datastore will be indexed). |
 
 #### Example Response
 - **Status Code**: 200 OK

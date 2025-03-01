@@ -2,11 +2,9 @@ from fetcher import Fetcher
 from flask import Flask, jsonify, request
 
 fetcher = Fetcher()
-
-app = Flask(__name__)
-
 fetcher.initTypesenseServer()
 
+app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
@@ -35,7 +33,7 @@ def search_news():
 def scrape_news():
     ticker = request.args.get("ticker")
     res = fetcher.scrape_news(ticker)
-    return jsonify(res)
+    return jsonify({"num_attempts": len(res), "num_success": len([r for r in res if not r["error"]]), "results": res})
 
 
 

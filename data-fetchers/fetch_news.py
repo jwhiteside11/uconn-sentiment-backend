@@ -52,12 +52,11 @@ Example usage:
 '''
 def scrape_news_story(url: str):
   if ds_client.newsStoryExists(url):
-    return None
+    return {"error": f"already scraped url"}
 
   source = fetch_utils.get_as_browser(url)
   if source.status_code != 200:
-    print("Error:", source.status_code, source.text)
-    return []
+    return {"error": f"{source.status_code} {source.text}"}
 
   try:
     # parse successful response
@@ -77,8 +76,7 @@ def scrape_news_story(url: str):
       "paragraphs": [p.get_text().replace('\xa0', ' ') for p in paragraphs]
     }
   except Exception as e:
-    print(e)
-    return []
+    return {"error": e}
 
 
 '''
@@ -113,12 +111,13 @@ def save_news_stories_to_xlsx(ticker: str, year: int, quarter: int):
 
 def scrape_news_story_to_datastore(ticker: str, url: str):
   res = scrape_news_story(url)
-  if res:
-    news_doc = NewsDocument(ticker, **res)
-    print(f"scraped:\n{news_doc.__dict__}")
-    ds_client.createNewsStoryEntity(news_doc)
+  if res['error']:
+    print(f"scrape failed: {url}", res['error'])
   else:
-    print("scrape failed")
+    news_doc = NewsDocument(ticker, **res)
+    print(f"scraped: {url}")
+    ds_client.createNewsStoryEntity(news_doc)
+  return res
   
 '''
 Scrape 10 news stories from specified quarter for the specified ticker, save to Datastore table
@@ -126,14 +125,18 @@ Scrape 10 news stories from specified quarter for the specified ticker, save to 
 Example usage:
   save_news_stories_to_datastore("MSFT", 2024, 3)
 '''
-def scrape_news_stories_to_datastore(ticker: str, year: int, quarter: int):
+def scrape_news_stories_to_datastore(ticker: str, year: int, quarter: int) -> List[Dict]:
   urls = get_article_urls(ticker, year, quarter, 100)
   print("urls: ", urls)
 
+  results = []
   for url in urls:
-    scrape_news_story_to_datastore(ticker, url)
+    res = scrape_news_story_to_datastore(ticker, url)
+    results.append(res)
     # sleep to avoid rate limiting
     time.sleep(2)
+  
+  return res
     
 
 
