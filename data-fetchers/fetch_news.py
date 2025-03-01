@@ -136,7 +136,7 @@ def scrape_news_stories_to_datastore(ticker: str, year: int, quarter: int) -> Li
     # sleep to avoid rate limiting
     time.sleep(2)
   
-  return res
+  return results
     
 
 
