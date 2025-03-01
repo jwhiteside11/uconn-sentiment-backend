@@ -31,6 +31,8 @@ def get_article_urls(ticker: str, year: int, quarter: int, num_articles: int = 1
     # create Google search query for Yahoo Finance news about the ticker symbol
     s_driver.get(f"https://www.google.com/search?q=finance%2Eyahoo%2Ecom+{ticker}&tbs=cdr:1,cd_min:{start_date},cd_max:{end_date}&tbm=nws&num={num_articles}&rls=en")
 
+    # wait for page to load all options
+    time.sleep(3)
     # select links of relevant text using <a> tag, filter yahoo news URLs
     links_elems = s_driver.wait_all_then_get(By.TAG_NAME, 'a')
     urls = [elem.get_attribute('href') for elem in links_elems]
