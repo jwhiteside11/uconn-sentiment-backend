@@ -106,7 +106,7 @@ Scrape news from Yahoo Finance using Selenium and requests.
     {"message": "failed: already scraped url https://finance.yahoo.com/news/webster-financial-corporation-wbs-best-093505383.html"},
     {"message": "success: https://finance.yahoo.com/news/webster-financials-nyse-wbs-dividend-120809687.html"},
     {"message": "success: https://finance.yahoo.com/news/earnings-preview-webster-financial-wbs-150010712.html"},
-  ]}
+  ]
 }
 ```
 ---
@@ -139,7 +139,7 @@ Search for news using Typesense server.
       "highlights": [
         ...
       ]
-  }
+    }
   ]
 }
 ```
