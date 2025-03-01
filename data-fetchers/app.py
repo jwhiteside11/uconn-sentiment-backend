@@ -33,7 +33,7 @@ def search_news():
 def scrape_news():
     ticker = request.args.get("ticker")
     res = fetcher.scrape_news(ticker)
-    return jsonify({"num_attempts": len(res), "num_success": len([r for r in res if not r["error"]]), "results": res})
+    return jsonify({"num_attempts": len(res), "num_success": len([r for r in res if "error" not in r]), "results": res})
 
 
 

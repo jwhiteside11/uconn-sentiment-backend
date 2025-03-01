@@ -111,7 +111,7 @@ def save_news_stories_to_xlsx(ticker: str, year: int, quarter: int):
 
 def scrape_news_story_to_datastore(ticker: str, url: str):
   res = scrape_news_story(url)
-  if res['error']:
+  if "error" in res:
     print(f"scrape failed: {url}", res['error'])
   else:
     news_doc = NewsDocument(ticker, **res)

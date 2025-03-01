@@ -13,7 +13,7 @@ class Fetcher:
     results = []
     for (y, q) in past_5_q:
       res = fetch_news.scrape_news_stories_to_datastore(ticker, y, q)
-      results += [{"message": f"error: {r['error']}" if r["error"] else f"success: {r['url']}"} for r in res]
+      results += [{"message": f"error: {r['error']}" if "error" in r else f"success: {r['url']}"} for r in res]
     return results
   
   def scrape_earnings_calls(self, ticker: str):
