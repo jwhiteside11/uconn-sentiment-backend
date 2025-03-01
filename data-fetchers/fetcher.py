@@ -1,4 +1,5 @@
 import fetch_news
+import fetch_utils
 from datastore_client import DatastoreClient
 from typesense_client import TypesenseClient, NewsDocument
 
@@ -8,7 +9,9 @@ class Fetcher:
     self.ts = TypesenseClient()
 
   def scrape_news(self, ticker: str):
-    return fetch_news.save_news_stories_to_datastore(ticker, 2024, 4)
+    past_5_q = fetch_utils.get_past_8_quarters()[:5]
+    for (y, q) in past_5_q:
+      fetch_news.scrape_news_stories_to_datastore(ticker, y, q)
   
   def scrape_earnings_calls(self, ticker: str):
     return None
@@ -20,8 +23,9 @@ class Fetcher:
     return self.ts.searchNews(ticker, search_term)
 
   def backfillTypesenseServer(self, ticker: str = ""):
-    self.ts.deleteNewsColletion()
-    self.ts.createNewsCollection()
+    if ticker == "":
+      self.ts.deleteNewsColletion()
+      self.ts.createNewsCollection()
 
     docs = self.ds.getAllNewsDocs(ticker)
     for doc in docs:
