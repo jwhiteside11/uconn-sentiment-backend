@@ -36,9 +36,9 @@ class Fetcher:
     for doc in docs:
       try:
         self.ts.createNewsDocument(doc)
-        print("added: ", doc.id)
+        print("added: ", doc.url)
       except Exception as e:
-        print("failed: ", doc.id)
+        print("failed: ", doc.url)
         fails += 1
 
     return {"num_indexed": len(docs) - fails}

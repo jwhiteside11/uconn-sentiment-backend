@@ -128,7 +128,7 @@ Example usage:
   save_news_stories_to_datastore("MSFT", 2024, 3)
 '''
 def scrape_news_stories_to_datastore(ticker: str, year: int, quarter: int) -> List[Dict]:
-  urls = get_article_urls(ticker, year, quarter, 100)
+  urls = get_article_urls(ticker, year, quarter, 20)
   print("urls: ", urls)
 
   results = []

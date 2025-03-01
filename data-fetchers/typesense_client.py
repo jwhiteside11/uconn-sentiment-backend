@@ -3,12 +3,11 @@ import json
 import sys
 
 class NewsDocument:
-    def __init__(self, ticker, date, title, url, paragraphs, id = ""):
+    def __init__(self, ticker, date, title, url, paragraphs):
         self.ticker = ticker
         self.date = date
         self.title = title
         self.url = url
-        self.id = id if id else url
         self.paragraphs = paragraphs
 
 
@@ -48,12 +47,17 @@ class TypesenseClient:
 
         try:
             res = self.client.collections['news'].documents.search(search_parameters)
-            condensed = {"num_hits": res["found"], "hits": [
-                {"title": hit["document"]["title"], "url": hit["document"]["url"], "highlights": [p for p in hit["highlight"]["paragraphs"] if len(p["matched_tokens"]) > 0]} for hit in res["hits"]
-            ]}
+            condensed = {
+                "num_hits": res["found"], 
+                "hits": [{
+                    "title": hit["document"]["title"], 
+                    "url": hit["document"]["url"], 
+                    "highlights": [p for p in hit["highlight"]["paragraphs"] if len(p["matched_tokens"]) > 0]
+                } for hit in res["hits"]]
+            }
             return json.dumps(condensed)
         except Exception as e:
-            return json.dumps({"message": f"error: {e}"}, indent=4)
+            return json.dumps({"message": f"error: {e}"})
 
     def deleteNewsColletion(self):
         return self.client.collections['news'].delete()

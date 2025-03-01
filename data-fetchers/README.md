@@ -90,13 +90,23 @@ Scrape news from Yahoo Finance using Selenium and requests.
 |--------------|--------|------------------------------------|
 | `ticker`       | str    | The ticker of the company of interest (required). |
 
-#### Example Response
+#### Example Request
+`curl localhost:5000/scrape_news?ticker=WBS`
+
+#### Response
 - **Status Code**: 200 OK
 - **Content-Type**: `application/json`
 
 ```json
 {
-  ...
+  "num_attempts": 4, 
+  "num_success": 3, 
+  "results": [
+    {"message": "success: https://finance.yahoo.com/news/curious-webster-financial-wbs-q4-141510242.html"},
+    {"message": "failed: already scraped url https://finance.yahoo.com/news/webster-financial-corporation-wbs-best-093505383.html"},
+    {"message": "success: https://finance.yahoo.com/news/webster-financials-nyse-wbs-dividend-120809687.html"},
+    {"message": "success: https://finance.yahoo.com/news/earnings-preview-webster-financial-wbs-150010712.html"},
+  ]}
 }
 ```
 ---
@@ -121,7 +131,16 @@ Search for news using Typesense server.
 
 ```json
 {
-  ...
+  "num_hits": 1, 
+  "hits": [
+    {
+      "title": "Curious about Webster Financial (WBS) Q4 Performance? Explore Wall Street Estimates for Key Metrics",
+      "url": "https://finance.yahoo.com/news/curious-webster-financial-wbs-q4-141510242.html", 
+      "highlights": [
+        ...
+      ]
+  }
+  ]
 }
 ```
 ---
@@ -145,6 +164,6 @@ Backfill Typesense server with news articles from Datastore.
 
 ```json
 {
-  ...
+  "num_indexed": 16
 }
 ```
