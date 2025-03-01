@@ -125,7 +125,10 @@ Search for news using Typesense server.
 | `ticker`       | str    | The ticker of the company of interest (required). |
 | `search_term`  | str    | The word/phrase to search for (required). |
 
-#### Example Response
+#### Example Request
+`curl localhost:5000/search_news?ticker=WBS&search_term=bank`
+
+#### Response
 - **Status Code**: 200 OK
 - **Content-Type**: `application/json`
 
@@ -158,7 +161,10 @@ Backfill Typesense server with news articles from Datastore.
 |--------------|--------|------------------------------------|
 | `ticker`       | str    | The ticker of the company of interest (optional; if not provided, evrey news document in the Datastore will be indexed). |
 
-#### Example Response
+#### Example Request
+`curl localhost:5000/backfill_typesense?ticker=WBS`
+
+#### Response
 - **Status Code**: 200 OK
 - **Content-Type**: `application/json`
 
