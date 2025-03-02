@@ -3,7 +3,7 @@ import json
 import sys
 
 class NewsDocument:
-    def __init__(self, ticker, date, title, url, paragraphs):
+    def __init__(self, ticker, date, title, url, paragraphs, id: str = ""):
         self.ticker = ticker
         self.date = date
         self.title = title
@@ -36,7 +36,7 @@ class TypesenseClient:
         })
 
     def createNewsDocument(self, news_doc: NewsDocument):
-        return self.client.collections['news'].documents.create(news_doc.__dict__)
+        return self.client.collections['news'].documents.create({**news_doc.__dict__, "id": news_doc.url})
 
     def searchNews(self, ticker: str, search_term: str):
         search_parameters = {
