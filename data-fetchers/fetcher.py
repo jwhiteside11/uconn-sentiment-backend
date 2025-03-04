@@ -1,5 +1,6 @@
 import fetch_news
 import fetch_utils
+from model_client import ModelClient
 from datastore_client import DatastoreClient
 from typesense_client import TypesenseClient, NewsDocument
 
@@ -7,33 +8,65 @@ class Fetcher:
   def __init__(self):
     self.ds = DatastoreClient()
     self.ts = TypesenseClient()
+    self.model = ModelClient()
 
   def scrape_news(self, ticker: str):
-    past_5_q = fetch_utils.get_past_8_quarters()[:5]
+    past_5_q = fetch_utils.get_past_8_quarters()[:1]
+
     results = []
     for (y, q) in past_5_q:
-      res = fetch_news.scrape_news_stories_to_datastore(ticker, y, q)
-      results += [{"message": f"error: {r['error']}" if "error" in r else f"success: {r['url']}"} for r in res]
+      # fetch Yahoo finance urls to scrape
+      urls = fetch_news.get_article_urls(ticker, y, q, 20)
+      # scrape each news story
+      for url in urls:
+        res = fetch_news.scrape_news_story(url)
+        if "error" in res:
+          print(f"scrape failed: {url}", res['error'])
+        else:
+          print(f"scraped: {url}")
+          # score using FinBERT model
+          score_res = self.model.score_text('\n'.join(res["paragraphs"]))
+          print(type(score_res["score"]))
+          news_doc = NewsDocument(ticker=ticker, score=score_res["score"], magnitude=score_res["magnitude"], **res)
+          # save document to datastore
+          self.ds.createNewsStoryEntity(news_doc)
+          # index into typesense
+          try:
+            self.ts.createNewsDocument(news_doc)
+            print("added: ", news_doc.url)
+          except Exception as e:
+            print("failed: ", news_doc.url, e)
+
+        results.append({"message": f"error: {res['error']}" if "error" in res else f"success: {res['url']}"})
+
     return results
   
+
   def scrape_earnings_calls(self, ticker: str):
     return None
 
   def get_news(self, ticker: str):
-    return self.ds.getAllNewsDocs(ticker)
+    return self.ts.getIndexedURLs(ticker)
 
   def search_news(self, ticker: str, search_term: str):
     return self.ts.searchNews(ticker, search_term)
 
-  def backfillTypesenseServer(self, ticker: str = ""):
-    if ticker == "":
+  def backfillTypesenseServer(self, ticker: str):
+    if ticker is None:
       print("resetting Typesense server")
       self.ts.deleteNewsColletion()
       self.ts.createNewsCollection()
     
-    docs = self.ds.getAllNewsDocs(ticker)
+    url_res = self.ts.getIndexedURLs(ticker)
+    indexed_urls = set(url_res["urls"] if "urls" in url_res else [])
+    ids = [id for id in self.ds.getAllNewsDocIDs(ticker) if id not in indexed_urls]
+    
     fails = 0
-    for doc in docs:
+    for id in ids:
+      if id in indexed_urls:
+        continue
+
+      doc = self.ds.getNewsDocByID(id)
       try:
         self.ts.createNewsDocument(doc)
         print("added: ", doc.url)
@@ -41,7 +74,7 @@ class Fetcher:
         print("failed: ", doc.url)
         fails += 1
 
-    return {"num_indexed": len(docs) - fails}
+    return {"num_found": len(ids), "num_indexed": len(ids) - fails}
     
   def initTypesenseServer(self):
     try:

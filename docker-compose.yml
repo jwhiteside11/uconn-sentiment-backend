@@ -1,0 +1,31 @@
+version: '3'
+services:
+  typesense:
+    image: typesense/typesense:28.0
+    ports:
+      - "8108:8108"
+    volumes:
+      - /tmp/data:/data
+    command: --data-dir /data --api-key=Hu52dwsas2AdxdE
+    restart: always
+
+  ckury:
+    build: ./ckury-services
+    image: model_server:latest
+    ports:
+      - "5200:5200"
+    restart: always
+
+  data-fetchers:
+    build: ./data-fetchers
+    image: fetch_server:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ~/.config/gcloud/application_default_credentials.json:/gcp/creds.json:ro
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/gcp/creds.json
+    ports:
+      - "5100:5100"
+    restart: always
+

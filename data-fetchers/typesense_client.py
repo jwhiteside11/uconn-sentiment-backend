@@ -3,12 +3,14 @@ import json
 import sys
 
 class NewsDocument:
-    def __init__(self, ticker, date, title, url, paragraphs, id: str = ""):
+    def __init__(self, ticker, date, title, url, paragraphs, id: str = "", score: float = 0, magnitude: float = 0):
         self.ticker = ticker
         self.date = date
         self.title = title
         self.url = url
         self.paragraphs = paragraphs
+        self.score = score
+        self.magnitude = magnitude
 
 
 class TypesenseClient:
@@ -32,27 +34,45 @@ class TypesenseClient:
                 {"name": "title", "type": "string" },
                 {"name": "url", "type": "string" },
                 {"name": "paragraphs", "type": "string[]" },
+                {"name": "score", "type": "float" },
+                {"name": "magnitude", "type": "float" },
             ]
         })
 
     def createNewsDocument(self, news_doc: NewsDocument):
         return self.client.collections['news'].documents.create({**news_doc.__dict__, "id": news_doc.url})
 
+    def getIndexedURLs(self, ticker: str):
+        search_parameters = {
+            'q'         : "*",
+            'filter_by' : f'ticker:={ticker}',
+            'include_fields': 'url'
+        }
+        try:
+            res = self.client.collections['news'].documents.search(search_parameters)
+            condensed = {
+                "num_hits": res["found"], 
+                "urls": [hit["document"]["url"] for hit in res["hits"]]
+            }
+            return condensed
+        except Exception as e:
+            return {"message": f"error: {e}"}
+
     def searchNews(self, ticker: str, search_term: str):
         search_parameters = {
-            'q'         : search_term,
+            'q'         : "*" if search_term is None else search_term,
             'query_by'  : 'paragraphs',
             'filter_by' : f'ticker:={ticker}'
         }
-
         try:
             res = self.client.collections['news'].documents.search(search_parameters)
+            print(res)
             condensed = {
                 "num_hits": res["found"], 
                 "hits": [{
                     "title": hit["document"]["title"], 
                     "url": hit["document"]["url"], 
-                    "highlights": [p for p in hit["highlight"]["paragraphs"] if len(p["matched_tokens"]) > 0]
+                    "highlights": [] if "paragraphs" not in hit["highlight"] else [p for p in hit["highlight"]["paragraphs"] if len(p["matched_tokens"]) > 0]
                 } for hit in res["hits"]]
             }
             return json.dumps(condensed)

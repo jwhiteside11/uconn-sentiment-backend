@@ -33,4 +33,6 @@ WORKDIR /opt/app
 RUN pip3 install -r requirements.txt
 COPY . /opt/app
  
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+# start flask server
+
+CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=5100"]

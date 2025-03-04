@@ -52,7 +52,7 @@ tmux new-session -A -t fetch_server
 # from tmux session
 sudo docker build --tag fetch_server .
 
-sudo docker run --add-host=host.docker.internal:host-gateway -p 5000:5000 fetch_server
+sudo docker run --add-host=host.docker.internal:host-gateway -p 5100:5100 fetch_server
 # (Ctrl + B) + D
 ```
 
@@ -60,18 +60,18 @@ So we have two Docker containers up and running. To interact with these services
 
 Everything is now up and running. Test the server using the `Hello world!` example.
 ```bash
-curl 'localhost:5000/'
+curl 'localhost:5100/'
 ```
 
 **Note:** each time the Typesense server is restarted, it must be backfilled with the news we've scraped into datastore. There is an endpoint for doing so.
 ```bash
-curl 'localhost:5000/backfill_typesense'
+curl 'localhost:5100/backfill_typesense'
 ```
 
 &nbsp;
 
 # API reference
-This code is wrapped with a Flask server. Interact with this code base using HTTP calls to `localhost:5000`. 
+This code is wrapped with a Flask server. Interact with this code base using HTTP calls to `localhost:5100`. 
 
 In the examples above, I use the `curl` shell command, but you can interface with the containers any HTTP library in any language.
 
@@ -91,7 +91,7 @@ Scrape news from Yahoo Finance using Selenium and requests.
 | `ticker`       | str    | The ticker of the company of interest (required). |
 
 #### Example Request
-`curl localhost:5000/scrape_news?ticker=WBS`
+`curl localhost:5100/scrape_news?ticker=WBS`
 
 #### Response
 - **Status Code**: 200 OK
@@ -126,7 +126,7 @@ Search for news using Typesense server.
 | `search_term`  | str    | The word/phrase to search for (required). |
 
 #### Example Request
-`curl localhost:5000/search_news?ticker=WBS&search_term=bank`
+`curl localhost:5100/search_news?ticker=WBS&search_term=bank`
 
 #### Response
 - **Status Code**: 200 OK
@@ -150,7 +150,7 @@ Search for news using Typesense server.
 
 ### GET /backfill_typesense
 
-Backfill Typesense server with news articles from Datastore.
+Backfill Typesense server with news articles from Datastore. It will skip the documents already found in the index.
 
 #### Request
 - **Method**: GET
@@ -162,7 +162,7 @@ Backfill Typesense server with news articles from Datastore.
 | `ticker`       | str    | The ticker of the company of interest (optional; if not provided, evrey news document in the Datastore will be indexed). |
 
 #### Example Request
-`curl localhost:5000/backfill_typesense?ticker=WBS`
+`curl localhost:5100/backfill_typesense?ticker=WBS`
 
 #### Response
 - **Status Code**: 200 OK
@@ -170,6 +170,7 @@ Backfill Typesense server with news articles from Datastore.
 
 ```json
 {
+  "num_found": 26,
   "num_indexed": 16
 }
 ```

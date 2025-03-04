@@ -78,7 +78,7 @@ def scrape_news_story(url: str):
       "paragraphs": [p.get_text().replace('\xa0', ' ') for p in paragraphs]
     }
   except Exception as e:
-    return {"error": e}
+    return {"error": repr(e)}
 
 
 '''

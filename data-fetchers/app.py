@@ -15,6 +15,9 @@ def hello_world():
 @app.route('/scrape_news', methods=['GET'])
 def scrape_news():
     ticker = request.args.get("ticker")
+    if ticker is None:
+        return jsonify({"message": "missing required query param: ticker"}), 400
+    
     res = fetcher.scrape_news(ticker)
     return jsonify({"num_attempts": len(res), "num_success": len([r for r in res if "error" not in r]), "results": res})
 
@@ -23,7 +26,11 @@ def scrape_news():
 @app.route('/search_news', methods=['GET'])
 def search_news():
     ticker = request.args.get("ticker")
+    if ticker is None:
+        return jsonify({"message": "missing required query param: ticker"}), 400
+    
     search_term = request.args.get("search_term")
+
     res = fetcher.search_news(ticker, search_term)
     return jsonify(res)
 
@@ -32,6 +39,7 @@ def search_news():
 @app.route('/backfill_typesense', methods=['GET'])
 def backfill():
     ticker = request.args.get("ticker")
+    
     res = fetcher.backfillTypesenseServer(ticker)
     return jsonify(res)
 
