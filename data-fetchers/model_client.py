@@ -3,14 +3,14 @@ import json
 
 class ModelClient:
     def __init__(self):
-        pass
+        self.model_url = 'http://host.docker.internal:5200'
     
     def score_text(self, text: str):
         try:
-            res = requests.post('http://host.docker.internal:5200/score_text', json={"text_content": text}).json()
+            res = requests.post(f'{self.model_url}/score_text', json={"text_content": text}).json()
             return res
         except Exception as e:
-            return {"error": repr(e)}
+            return {"message": f"ERROR {e}"}
 
 
 def run_program():

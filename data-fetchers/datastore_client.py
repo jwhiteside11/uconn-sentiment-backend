@@ -12,7 +12,7 @@ class DatastoreClient:
         query.add_filter(filter=datastore.query.PropertyFilter('url', '=', url))
         return query.fetch().num_results > 0
     
-    def createNewsStoryEntity(self, news_doc: NewsDocument):
+    def createNewsStoryEntity(self, news_doc: NewsDocument) -> None:
         # if news story with same url exists, don't replicate
         if self.newsStoryExists(news_doc.url):
             return
