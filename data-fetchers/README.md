@@ -91,7 +91,7 @@ Scrape news from Yahoo Finance using Selenium and requests.
 | `ticker`       | str    | The ticker of the company of interest (required). |
 
 #### Example Request
-`curl localhost:5100/scrape_news?ticker=WBS`
+`curl 'localhost:5100/scrape_news?ticker=WBS'`
 
 #### Response
 - **Status Code**: 200 OK
@@ -126,7 +126,7 @@ Search for news using Typesense server.
 | `search_term`  | str    | The word/phrase to search for (required). |
 
 #### Example Request
-`curl localhost:5100/search_news?ticker=WBS&search_term=bank`
+`curl 'localhost:5100/search_news?ticker=WBS&search_term=bank'`
 
 #### Response
 - **Status Code**: 200 OK
@@ -162,7 +162,7 @@ Backfill Typesense server with news articles from Datastore. It will skip the do
 | `ticker`       | str    | The ticker of the company of interest (optional; if not provided, evrey news document in the Datastore will be indexed). |
 
 #### Example Request
-`curl localhost:5100/backfill_typesense?ticker=WBS`
+`curl 'localhost:5100/backfill_typesense?ticker=WBS'`
 
 #### Response
 - **Status Code**: 200 OK
