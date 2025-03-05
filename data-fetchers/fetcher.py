@@ -44,7 +44,7 @@ class Fetcher:
         except Exception as e:
           print("failed: ", news_doc.url, e)
 
-        results.append({"message": f"SUCCESS {res['url']} {set(indexed['urls'])}"})
+        results.append({"message": f"SUCCESS {res['url']}"})
 
     return results
   
