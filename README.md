@@ -9,15 +9,25 @@ The project is structured into subfolders that each represent a Docker container
 First, install docker if necessary.
 
 ```bash
-sudo apt install docker
+sudo apt install docker.io
 sudo apt install docker-compose-v2
 ```
 
 Then, to run all services:
 ```bash
+tmux new-session -A -t backend
+
+# from tmux session
 docker compose up
+# (Ctrl + B) + D
 ```
+
 This will run the `docker-compose.yml` file, building the Docker images and running the containers for each service. The images can taken about 10 minutes to build.
+
+The service is now up and running. You can confirm by testing the 'hello, world' endpoint:
+```bash
+curl 'http://localhost:5100/'
+```
 
 The main API is `data-fetchers` service for now. Refer to the [API reference](/data-fetchers#api-reference) for useful API endpoints.
   
