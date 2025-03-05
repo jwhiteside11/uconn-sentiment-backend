@@ -3,13 +3,14 @@ import json
 import sys
 
 class NewsDocument:
-    def __init__(self, ticker, date, title, url, paragraphs, id = ""):
+    def __init__(self, ticker: str, date: str, title: str, url: str, paragraphs: list[str], score: float = 0, magnitude: float = 0, id: str = ""):
         self.ticker = ticker
         self.date = date
         self.title = title
         self.url = url
-        self.id = id if id else url
         self.paragraphs = paragraphs
+        self.score = score
+        self.magnitude = magnitude
 
 
 class TypesenseClient:
@@ -33,27 +34,54 @@ class TypesenseClient:
                 {"name": "title", "type": "string" },
                 {"name": "url", "type": "string" },
                 {"name": "paragraphs", "type": "string[]" },
+                {"name": "score", "type": "float" },
+                {"name": "magnitude", "type": "float" },
             ]
         })
 
     def createNewsDocument(self, news_doc: NewsDocument):
-        return self.client.collections['news'].documents.create(news_doc.__dict__)
+        return self.client.collections['news'].documents.create({**news_doc.__dict__, "id": news_doc.url})
+
+    def getIndexedURLs(self, ticker: str):
+        search_parameters = {
+            'q'         : "*",
+            'query_by'  : 'title',
+            'filter_by' : f'ticker:={ticker}',
+            'include_fields': 'url, score, magnitude'
+        }
+        try:
+            res = self.client.collections['news'].documents.search(search_parameters)
+            condensed = {
+                "num_hits": res["found"], 
+                "urls": [hit["document"]["url"] for hit in res["hits"]]
+            }
+            return condensed
+        except Exception as e:
+            return {"message": f"ERROR {e}"}
 
     def searchNews(self, ticker: str, search_term: str):
         search_parameters = {
-            'q'         : search_term,
+            'q'         : "*" if search_term is None else search_term,
             'query_by'  : 'paragraphs',
-            'filter_by' : f'ticker:={ticker}'
+            'highlight_fields': 'paragraphs',
+            'filter_by' : f'ticker:={ticker}',
+            'include_fields': 'url, title, score, magnitude'
         }
-
         try:
             res = self.client.collections['news'].documents.search(search_parameters)
-            condensed = {"num_hits": res["found"], "hits": [
-                {"title": hit["document"]["title"], "url": hit["document"]["url"], "highlights": [p for p in hit["highlight"]["paragraphs"] if len(p["matched_tokens"]) > 0]} for hit in res["hits"]
-            ]}
+            condensed = {
+                "num_hits": res["found"], 
+                "hits": [{
+                    "title": hit["document"]["title"], 
+                    "url": hit["document"]["url"], 
+                    "score": hit["document"]["score"],
+                    "magnitude": hit["document"]["magnitude"],
+                    "highlights": [] if "paragraphs" not in hit["highlight"] else [p for p in hit["highlight"]["paragraphs"] if len(p["matched_tokens"]) > 0]
+                } for hit in res["hits"]]
+            }
             return json.dumps(condensed)
         except Exception as e:
-            return json.dumps({"message": f"error: {e}"}, indent=4)
+            return json.dumps({"message": f"ERROR {e}"})
 
     def deleteNewsColletion(self):
         return self.client.collections['news'].delete()

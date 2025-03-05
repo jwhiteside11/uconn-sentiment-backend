@@ -12,15 +12,12 @@ class DatastoreClient:
         query.add_filter(filter=datastore.query.PropertyFilter('url', '=', url))
         return query.fetch().num_results > 0
     
-    def createNewsStoryEntity(self, news_doc: NewsDocument, id: str = ""):
+    def createNewsStoryEntity(self, news_doc: NewsDocument) -> None:
         # if news story with same url exists, don't replicate
         if self.newsStoryExists(news_doc.url):
             return
         
-        if id:
-            story = datastore.Entity(self.client.key("newsJDWpoc", id), exclude_from_indexes=("paragraphs",))
-        else:
-            story = datastore.Entity(self.client.key("newsJDWpoc"), exclude_from_indexes=("paragraphs",))
+        story = datastore.Entity(self.client.key("newsJDWpoc", news_doc.url), exclude_from_indexes=("paragraphs",))
         story.update(news_doc.__dict__)
         self.client.put(story)
 
@@ -29,7 +26,7 @@ class DatastoreClient:
         story = self.client.get(key)
         return NewsDocument(**{pair[0]: pair[1] for pair in story.items()})
 
-    def getAllNewsDocIDs(self, ticker: str = "") -> NewsDocument:
+    def getAllNewsDocIDs(self, ticker: str = "") -> list[str]:
         query = self.client.query(kind="newsJDWpoc")
         query.keys_only()
         if ticker:
@@ -59,24 +56,12 @@ def run_program():
         ts.createNewsDocument(new_doc)
     
 def test_program():
-    # 1) Create clients
     ds = DatastoreClient()
-    ts = TypesenseClient()
 
-    # 2) Create entity
-    # ds.createNewsStoryEntity(doc1, "testStory")
+    ids = ds.getAllNewsDocIDs()
 
     # 3) Fetch entity
     docFetched = ds.getNewsDocByID("testStory")
-
-    # 4) Index into typesense
-    ts.deleteNewsColletion()
-    ts.createNewsCollection()
-    ts.createNewsDocument(docFetched)
-
-    # 5) Search documents
-    res = ts.searchNews(ticker="WBS", search_term="AI")
-    print(res)
 
 if __name__ == "__main__":
     run_program()

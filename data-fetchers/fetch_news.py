@@ -31,6 +31,8 @@ def get_article_urls(ticker: str, year: int, quarter: int, num_articles: int = 1
     # create Google search query for Yahoo Finance news about the ticker symbol
     s_driver.get(f"https://www.google.com/search?q=finance%2Eyahoo%2Ecom+{ticker}&tbs=cdr:1,cd_min:{start_date},cd_max:{end_date}&tbm=nws&num={num_articles}&rls=en")
 
+    # wait for page to load all options
+    time.sleep(3)
     # select links of relevant text using <a> tag, filter yahoo news URLs
     links_elems = s_driver.wait_all_then_get(By.TAG_NAME, 'a')
     urls = [elem.get_attribute('href') for elem in links_elems]
@@ -52,12 +54,11 @@ Example usage:
 '''
 def scrape_news_story(url: str):
   if ds_client.newsStoryExists(url):
-    return None
+    return {"error": f"already scraped url"}
 
   source = fetch_utils.get_as_browser(url)
   if source.status_code != 200:
-    print("Error:", source.status_code, source.text)
-    return []
+    return {"error": f"{source.status_code} {source.text}"}
 
   try:
     # parse successful response
@@ -77,8 +78,7 @@ def scrape_news_story(url: str):
       "paragraphs": [p.get_text().replace('\xa0', ' ') for p in paragraphs]
     }
   except Exception as e:
-    print(e)
-    return []
+    return {"error": repr(e)}
 
 
 '''
@@ -113,12 +113,13 @@ def save_news_stories_to_xlsx(ticker: str, year: int, quarter: int):
 
 def scrape_news_story_to_datastore(ticker: str, url: str):
   res = scrape_news_story(url)
-  if res:
-    news_doc = NewsDocument(ticker, **res)
-    print(f"scraped:\n{news_doc.__dict__}")
-    ds_client.createNewsStoryEntity(news_doc)
+  if "error" in res:
+    print(f"scrape failed: {url}", res['error'])
   else:
-    print("scrape failed")
+    news_doc = NewsDocument(ticker, **res)
+    print(f"scraped: {url}")
+    ds_client.createNewsStoryEntity(news_doc)
+  return res
   
 '''
 Scrape 10 news stories from specified quarter for the specified ticker, save to Datastore table
@@ -126,14 +127,18 @@ Scrape 10 news stories from specified quarter for the specified ticker, save to 
 Example usage:
   save_news_stories_to_datastore("MSFT", 2024, 3)
 '''
-def scrape_news_stories_to_datastore(ticker: str, year: int, quarter: int):
-  urls = get_article_urls(ticker, year, quarter, 100)
+def scrape_news_stories_to_datastore(ticker: str, year: int, quarter: int) -> List[Dict]:
+  urls = get_article_urls(ticker, year, quarter, 20)
   print("urls: ", urls)
 
+  results = []
   for url in urls:
-    scrape_news_story_to_datastore(ticker, url)
+    res = scrape_news_story_to_datastore(ticker, url)
+    results.append(res)
     # sleep to avoid rate limiting
     time.sleep(2)
+  
+  return results
     
 
 
