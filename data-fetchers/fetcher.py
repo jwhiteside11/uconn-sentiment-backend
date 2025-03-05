@@ -17,27 +17,35 @@ class Fetcher:
     for (y, q) in past_5_q:
       # fetch Yahoo finance urls to scrape
       urls = fetch_news.get_article_urls(ticker, y, q, 20)
+      
+      # exclude urls that have already been scraped
+      indexed = self.ts.getIndexedURLs(ticker)
+      if "num_hits" in indexed:
+        urls = [url for url in urls if url not in set(indexed["urls"])]
+
       # scrape each news story
       for url in urls:
         res = fetch_news.scrape_news_story(url)
         if "error" in res:
           print(f"scrape failed: {url}", res['error'])
-        else:
-          print(f"scraped: {url}")
-          # score using FinBERT model
-          score_res = self.model.score_text('\n'.join(res["paragraphs"]))
-          print(type(score_res["score"]))
-          news_doc = NewsDocument(ticker=ticker, score=score_res["score"], magnitude=score_res["magnitude"], **res)
-          # save document to datastore
-          self.ds.createNewsStoryEntity(news_doc)
-          # index into typesense
-          try:
-            self.ts.createNewsDocument(news_doc)
-            print("added: ", news_doc.url)
-          except Exception as e:
-            print("failed: ", news_doc.url, e)
+          results.append({"message": f"ERROR {res['error']}"})
+          continue
 
-        results.append({"message": f"error: {res['error']}" if "error" in res else f"success: {res['url']}"})
+        print(f"scraped: {url}")
+        # score using FinBERT model
+        score_res = self.model.score_text('\n'.join(res["paragraphs"]))
+        # save document to datastore
+        news_doc = NewsDocument(ticker=ticker, score=score_res["score"], magnitude=score_res["magnitude"], **res)
+        self.ds.createNewsStoryEntity(news_doc)
+        # index into typesense
+        try:
+          self.ts.createNewsDocument(news_doc)
+          print("added: ", news_doc.url)
+        except Exception as e:
+          print("failed: ", news_doc.url, e)
+
+        results.append({"message": f"SUCCESS {res['url']} {set(indexed['urls'])}"})
+        break
 
     return results
   
@@ -50,6 +58,21 @@ class Fetcher:
 
   def search_news(self, ticker: str, search_term: str):
     return self.ts.searchNews(ticker, search_term)
+
+  def score_news(self, ticker: str):
+      results = []
+      urls = self.ds.getAllNewsDocIDs(ticker)
+      
+      for url in urls:
+        doc = self.ds.getNewsDocByID(url)
+        # score using FinBERT model
+        score_res = self.model.score_text('\n'.join(doc.paragraphs))
+        doc.score = score_res["score"]
+        doc.magnitude = score_res["magnitude"]
+        # save document to datastore
+        self.ds.createNewsStoryEntity(doc)
+        results.append({"message": f"SUCCESS {doc.url} score: {doc.score} magnitude: {doc.magnitude}"})
+      return results
 
   def backfillTypesenseServer(self, ticker: str):
     if ticker is None:

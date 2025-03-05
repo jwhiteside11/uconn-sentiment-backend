@@ -35,6 +35,16 @@ def search_news():
     return jsonify(res)
 
 
+@app.route('/score_news', methods=['GET'])
+def score_news():
+    ticker = request.args.get("ticker")
+    if ticker is None:
+        return jsonify({"message": "missing required query param: ticker"}), 400
+    
+    res = fetcher.score_news(ticker)
+    return jsonify({"num_attempts": len(res), "num_success": len([r for r in res if "error" not in r]), "results": res})
+
+
 # Backfill Typesense server with Datastore content
 @app.route('/backfill_typesense', methods=['GET'])
 def backfill():

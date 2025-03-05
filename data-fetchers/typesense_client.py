@@ -3,7 +3,7 @@ import json
 import sys
 
 class NewsDocument:
-    def __init__(self, ticker, date, title, url, paragraphs, id: str = "", score: float = 0, magnitude: float = 0):
+    def __init__(self, ticker: str, date: str, title: str, url: str, paragraphs: list[str], score: float = 0, magnitude: float = 0, id: str = ""):
         self.ticker = ticker
         self.date = date
         self.title = title
@@ -45,6 +45,7 @@ class TypesenseClient:
     def getIndexedURLs(self, ticker: str):
         search_parameters = {
             'q'         : "*",
+            'query_by'  : 'title',
             'filter_by' : f'ticker:={ticker}',
             'include_fields': 'url, score, magnitude'
         }
@@ -62,6 +63,7 @@ class TypesenseClient:
         search_parameters = {
             'q'         : "*" if search_term is None else search_term,
             'query_by'  : 'paragraphs',
+            'highlight_fields': 'paragraphs',
             'filter_by' : f'ticker:={ticker}',
             'include_fields': 'url, title, score, magnitude'
         }
