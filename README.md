@@ -17,7 +17,7 @@ Then, to run all services:
 ```bash
 docker compose up
 ```
-This will run the `docker-compose.yml` file, building the Docker images and running the containers for each service.
+This will run the `docker-compose.yml` file, building the Docker images and running the containers for each service. The images can taken about 10 minutes to build.
 
 The main API is `data-fetchers` service for now. Refer to the [API reference](/data-fetchers#api-reference) for useful API endpoints.
   

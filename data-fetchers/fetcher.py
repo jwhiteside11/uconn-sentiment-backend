@@ -11,12 +11,12 @@ class Fetcher:
     self.model = ModelClient()
 
   def scrape_news(self, ticker: str):
-    past_5_q = fetch_utils.get_past_8_quarters()[:1]
+    past_5_q = fetch_utils.get_past_8_quarters()[:2]
 
     results = []
     for (y, q) in past_5_q:
       # fetch Yahoo finance urls to scrape
-      urls = fetch_news.get_article_urls(ticker, y, q, 20)
+      urls = fetch_news.get_article_urls(ticker, y, q, 25)
       
       # exclude urls that have already been scraped
       indexed = self.ts.getIndexedURLs(ticker)
@@ -45,7 +45,6 @@ class Fetcher:
           print("failed: ", news_doc.url, e)
 
         results.append({"message": f"SUCCESS {res['url']} {set(indexed['urls'])}"})
-        break
 
     return results
   
