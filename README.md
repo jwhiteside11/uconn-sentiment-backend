@@ -6,7 +6,14 @@ The project is structured into subfolders that each represent a Docker container
 
 ## Docker Compose
 
-To run all services:
+First, install docker if necessary.
+
+```bash
+sudo apt install docker
+sudo apt install docker-compose-v2
+```
+
+Then, to run all services:
 ```bash
 docker compose up
 ```
