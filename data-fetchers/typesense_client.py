@@ -1,5 +1,4 @@
 import typesense
-import json
 import sys
 
 class NewsDocument:
@@ -76,12 +75,12 @@ class TypesenseClient:
                     "url": hit["document"]["url"], 
                     "score": hit["document"]["score"],
                     "magnitude": hit["document"]["magnitude"],
-                    "highlights": [] if "paragraphs" not in hit["highlight"] else [p for p in hit["highlight"]["paragraphs"] if len(p["matched_tokens"]) > 0]
+                    "highlights": [] if "paragraphs" not in hit["highlight"] else [p["snippet"] for p in hit["highlight"]["paragraphs"] if len(p["matched_tokens"]) > 0]
                 } for hit in res["hits"]]
             }
-            return json.dumps(condensed)
+            return condensed
         except Exception as e:
-            return json.dumps({"message": f"ERROR {e}"})
+            return {"message": f"ERROR {e}"}
 
     def deleteNewsColletion(self):
         return self.client.collections['news'].delete()

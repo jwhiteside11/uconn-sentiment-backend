@@ -18,7 +18,7 @@ Then, to run all services:
 tmux new-session -A -t backend
 
 # from tmux session
-docker compose up
+sudo docker compose up
 # (Ctrl + B) + D
 ```
 
