@@ -23,9 +23,10 @@ services:
     ports:
       - "5100:5100"
     restart: always
-    volumes:
-      - ~/.config/gcloud/application_default_credentials.json:/gcp/creds.json:ro
-    environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=/gcp/creds.json
-      - GOOGLE_CLOUD_PROJECT=sentiment-test-417820
+    # volumes:
+    #   - ~/.config/gcloud/application_default_credentials.json:/gcp/creds.json:ro
+    # environment:
+    #   - GOOGLE_APPLICATION_CREDENTIALS=/gcp/creds.json
+    #   - GOOGLE_CLOUD_PROJECT=sentiment-test-417820
+    # # REMOVE COMMENTS ABOVE FOR LOCAL DEVELOPMENT #
 
