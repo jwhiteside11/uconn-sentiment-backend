@@ -9,9 +9,9 @@ This repository holds all of the code needed by the virtual machine to:
 Please note that most of this code has been developed by others and only was cleaned up by me and consolidated into a single repository to improve the ease of cloning data into the virtual machine.
 
 # API reference
-This code is wrapped with a Flask server. Interact with this code base using HTTP calls to `localhost:5100`. 
+This code is wrapped with a Flask server. Interact with this code base using HTTP calls to `localhost:5200`. 
 
-In the examples above, I use the `curl` shell command, but you can interface with the containers any HTTP library in any language.
+In the examples below, I use the `curl` shell command, but you can interface with the containers any HTTP library in any language.
 
 ## Endpoints
 
@@ -30,7 +30,7 @@ Perform sentiment analysis on text, returns sentiment score and magnitude.
 | `text_content`       | str    | The text to score (required). |
 
 #### Example Request
-`curl -X -d '{"text_content": "Example body of text."}' -H "Content-Type: application/json" localhost:5100/score_text`
+`curl -d '{"text_content": "Example body of text."}' -H "Content-Type: application/json" localhost:5200/score_text`
 
 #### Response
 - **Status Code**: 200 OK

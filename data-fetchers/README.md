@@ -137,11 +137,15 @@ Search for news using Typesense server.
   "num_hits": 1, 
   "hits": [
     {
-      "title": "Curious about Webster Financial (WBS) Q4 Performance? Explore Wall Street Estimates for Key Metrics",
-      "url": "https://finance.yahoo.com/news/curious-webster-financial-wbs-q4-141510242.html", 
       "highlights": [
-        ...
-      ]
+        "holding company for Webster <mark>Bank</mark> would post earnings of",
+        "belongs to the Zacks <mark>Bank</mark>s - Northeast industry, posted revenues",
+        "the Zacks Industry Rank, <mark>Bank</mark>s - Northeast is currently in"
+      ],
+      "magnitude": 7.303900000000001,
+      "score": 0.05226564407348633,
+      "title": "Webster Financial (WBS) Q4 Earnings Top Estimates",
+      "url": "https://finance.yahoo.com/news/webster-financial-wbs-q4-earnings-134004111.html"
     }
   ]
 }

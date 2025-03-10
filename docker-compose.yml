@@ -28,4 +28,5 @@ services:
     # environment:
     #   - GOOGLE_APPLICATION_CREDENTIALS=/gcp/creds.json
     #   - GOOGLE_CLOUD_PROJECT=sentiment-test-417820
+    # # REMOVE COMMENTS ABOVE FOR LOCAL DEVELOPMENT #
 
