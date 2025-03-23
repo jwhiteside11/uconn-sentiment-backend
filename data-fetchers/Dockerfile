@@ -35,4 +35,4 @@ COPY . /opt/app
  
 # start flask server
 
-CMD [ "python3", "-u" , "-m" , "flask", "run", "--host=0.0.0.0", "--port=5100"]
+CMD [ "python3", "-u" , "-m" , "flask", "run", "--host=0.0.0.0", "--port=5300"]

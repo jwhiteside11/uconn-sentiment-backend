@@ -11,4 +11,4 @@ COPY . /opt/app
  
 # start flask server
 
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=5400"]
+CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=5300"]
