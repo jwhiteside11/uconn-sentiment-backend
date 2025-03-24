@@ -2,12 +2,22 @@
 <html>
   <body>
     <h1>Search news articles</h1>
-    <form action="http://34.44.103.189:5100/api/search_news">
-      <p>Ticker:</p>
-      <input type="text" name="ticker"/>
-      <p>Search:</p>
-      <input type="text" name="search_term"/>
-      <input type="submit">
-    </form>
+
+    <p>Ticker:</p>
+    <select name="ticker" id="ticker-select">
+      <option value="WBS">WBS</option>
+      {% for item in ticker_list %}
+        {% if item.value != "WBS" %}
+          <option value="{{item.value}}">{{ item.value }}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
+
+    <p>Search:</p>
+    <input type="text" name="search_term" id="search-bar"/>
+
+    <div id="search-results">
+    </div>
+    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
   </body>
 </html>

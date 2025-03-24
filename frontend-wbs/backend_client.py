@@ -9,8 +9,11 @@ class BackendClient:
     self.PUBLIC_AUTH_URL: str = f'{self.PROD_VM_URL}/auth'
     self.AUTH_PASSKEY = 'example'
 
-  def GET(self, path: str):
+  def API_GET(self, path: str):
     return requests.get(self.PUBLIC_API_URL + path)
 
   def search_news(self, ticker: str, search_term: str):
-    return self.GET(f'/search_news?ticker={ticker}&search_term={search_term}')
+    return self.API_GET(f'/search_news?ticker={ticker}&search_term={search_term}')
+  
+  def get_tickers(self):
+    return self.API_GET('/search_news/indexed_tickers')

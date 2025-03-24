@@ -1,6 +1,6 @@
 runtime: python39  # Specifies the Python runtime version
 
-entrypoint: python3 -m flask run --host=0.0.0.0 --port=8080
+entrypoint: gunicorn --bind 0.0.0.0:8080 app:app
 
 automatic_scaling:
   min_instances: 0  # Allow scaling down to zero instances when there's no traffic

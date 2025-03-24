@@ -15,7 +15,8 @@ def hello_world():
 # Search news using Typesense
 @app.route('/search_news', methods=['GET'])
 def search_news():
-    return render_template("search_news.html")
+    res = api_client.get_tickers().json()
+    return render_template("search_news.html", ticker_list=res["tickers"])
 
 
 if __name__ == "__main__":

@@ -9,6 +9,6 @@ WORKDIR /opt/app
 RUN pip3 install -r requirements.txt
 COPY . /opt/app
  
-# start flask server
+# start flask server - use gunicorn in production
 
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=5300"]
+CMD [ "gunicorn", "--bind" , "0.0.0.0:8080" , "app:app"]

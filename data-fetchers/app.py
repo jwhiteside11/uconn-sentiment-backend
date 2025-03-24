@@ -22,7 +22,6 @@ def scrape_news():
     return jsonify({"num_attempts": len(res), "num_success": len([r for r in res if "error" not in r]), "results": res})
 
 
-# Search news using Typesense
 @app.route('/search_news', methods=['GET'])
 def search_news():
     ticker = request.args.get("ticker", default="")
@@ -34,6 +33,12 @@ def search_news():
     res = fetcher.search_news(ticker, search_term)
     return jsonify(res)
 
+
+# Get tickers indexed in typesense
+@app.route('/search_news/indexed_tickers', methods=['GET'])
+def indexed_tickers():
+    res = fetcher.ts.getIndexedTickers()
+    return jsonify(res)
 
 @app.route('/score_news', methods=['GET'])
 def score_news():
