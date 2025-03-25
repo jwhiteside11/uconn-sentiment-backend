@@ -55,6 +55,14 @@ class Fetcher:
   def get_news(self, ticker: str):
     return self.ts.getIndexedURLs(ticker)
 
+  def get_summary(self, ticker: str):
+    ticker_res = self.ts.getScoresByTicker(ticker)
+    # if "message" in ticker_res:
+    #   return ticker_res
+    
+    # tickers = ticker_res["tickers"]
+    return ticker_res
+
   def search_news(self, ticker: str, search_term: str):
     return self.ts.searchNews(ticker, search_term)
 

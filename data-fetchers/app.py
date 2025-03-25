@@ -40,6 +40,18 @@ def indexed_tickers():
     res = fetcher.ts.getIndexedTickers()
     return jsonify(res)
 
+
+# Get tickers indexed in typesense
+@app.route('/search_news/summary', methods=['GET'])
+def summarize():
+    ticker = request.args.get("ticker", default="")
+    if ticker == "":
+        return jsonify({"message": "missing required query param: ticker"}), 400
+    
+    res = fetcher.get_summary(ticker)
+    return jsonify(res)
+
+
 @app.route('/score_news', methods=['GET'])
 def score_news():
     ticker = request.args.get("ticker", default="")

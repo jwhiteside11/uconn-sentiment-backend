@@ -17,3 +17,6 @@ class BackendClient:
   
   def get_tickers(self):
     return self.API_GET('/search_news/indexed_tickers')
+  
+  def get_summary(self, ticker: str):
+    return self.API_GET(f'/search_news/summary?ticker={ticker}')

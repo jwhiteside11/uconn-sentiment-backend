@@ -19,5 +19,13 @@ def search_news():
     return render_template("search_news.html", ticker_list=res["tickers"])
 
 
+# Data visualization graphs
+@app.route('/graph_news', methods=['GET'])
+def graph():
+    ticker_res = api_client.get_tickers().json()
+    summary_res = api_client.get_summary("WBS").json()
+    return render_template("graphs_example.html", ticker_list=ticker_res["tickers"], summary=summary_res)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
