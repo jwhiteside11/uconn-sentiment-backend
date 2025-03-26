@@ -1,12 +1,39 @@
-# CODE MERGE AND CLEANUP IN-PROGRESS
-	
-# Sentiment Project Backend
-This repository holds all of the code needed by the virtual machine to:
-1. Score conference calls
-2. Summarize data
-3. Upload data to cloud datastore. 
+# UConn Sentiment Backend
 
-Please note that most of this code has been developed by others and only was cleaned up by me and consolidated into a single repository to improve the ease of cloning data into the virtual machine.
+This repository is a collective effort of UConn students to provide backend services for the Sentiment Analysis application. 
 
-# Sentiment Project Automation
-This repository holds all of the files and code for scripts used to automate the scoring process on Google Cloud Compute Engine. Note that this does not include any of the actual scoring and calculating, only file/data downloads, environment preparation, activating the scoring program, weighting, and summary programs, datastore upload, and environemnt cleanup. Note that this is intended to run on a Spot/Preemptive VM (a virtual machine that is at a heavily reduced cost in exchange for the potential of the machine being prematurely shutdown) and thusly has logic to handle a preemption if one occurs (not currently functional).
+The project is structured into subfolders that each represent a Docker container. These containers are designed to run on the Google Compute Engine production instance. Select a service for more information.
+
+## Docker Compose
+
+First, install docker if necessary.
+
+```bash
+sudo apt install docker.io
+sudo apt install docker-compose-v2
+```
+
+Then, to run all services:
+```bash
+tmux new-session -A -t backend
+
+# from tmux session
+sudo docker compose up
+# (Ctrl + B) + D
+```
+
+This will run the `docker-compose.yml` file, building the Docker images and running the containers for each service. The images can taken about 10 minutes to build.
+
+The backend is now up and running. You can confirm by testing the 'hello, world' endpoint:
+```bash
+curl 'http://localhost:5100/api'
+```
+
+The main API is `data-fetchers` service for now. Refer to the [API reference](/data-fetchers#api-reference) for useful API endpoints.
+  
+**Containerized Services**:
+- `data-fetchers` - Flask server for scraping news data, interfacing with Datastore, and interfacing with Typesense.
+- `ckury-services` - Flask server for scoring and summarizing sentiment in text, interacting with model; code from original ckury repo. Used by `data-fetchers` service.
+- `typesense` - Typesense server for searching news data. Used by `data-fetchers` service.
+- `reverse-proxy` - Nginx server with routes pointing to `data-fetchers` service and `auth` service (TODO: JD). These two are the only public facing services exposed, the rest should only be used internally.
+

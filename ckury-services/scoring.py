@@ -11,6 +11,7 @@ from sklearn.preprocessing import MinMaxScaler
 # Required nltk files, only downloaded on first use
 nltk.download('vader_lexicon')
 nltk.download('punkt')
+nltk.download('punkt_tab')
 
 model = AutoModelForSequenceClassification.from_pretrained('ProsusAI/finBERT')
 tokenizer = AutoTokenizer.from_pretrained('ProsusAI/finBERT')
@@ -186,8 +187,7 @@ def split_text(text, chunk_size):
     return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
 
 if __name__ == "__main__":
-    scoring_input = sys.argv[1]
-    keywords_input = sys.argv[2]
-    output_input = sys.argv[3]
+    text_content = sys.argv[1]
 
-    score_csv(scoring_input, keywords_input, output_input)
+    res = process_chunk(text_content)
+    print(res)
