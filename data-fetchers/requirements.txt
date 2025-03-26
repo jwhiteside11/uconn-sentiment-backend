@@ -6,3 +6,4 @@ Requests==2.32.3
 selenium==4.29.0
 typesense==0.21.0
 google-cloud-datastore==2.20.2
+gunicorn==23.0.0

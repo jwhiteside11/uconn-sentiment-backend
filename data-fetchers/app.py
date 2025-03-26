@@ -14,31 +14,48 @@ def hello_world():
 # Scrape news using Selenium and requests, stores in Datastore
 @app.route('/scrape_news', methods=['GET'])
 def scrape_news():
-    ticker = request.args.get("ticker")
-    if ticker is None:
+    ticker = request.args.get("ticker", default="")
+    if ticker == "":
         return jsonify({"message": "missing required query param: ticker"}), 400
     
     res = fetcher.scrape_news(ticker)
     return jsonify({"num_attempts": len(res), "num_success": len([r for r in res if "error" not in r]), "results": res})
 
 
-# Search news using Typesense
 @app.route('/search_news', methods=['GET'])
 def search_news():
-    ticker = request.args.get("ticker")
-    if ticker is None:
+    ticker = request.args.get("ticker", default="")
+    if ticker == "":
         return jsonify({"message": "missing required query param: ticker"}), 400
     
-    search_term = request.args.get("search_term")
+    search_term = request.args.get("search_term", default="")
 
     res = fetcher.search_news(ticker, search_term)
     return jsonify(res)
 
 
+# Get tickers indexed in typesense
+@app.route('/search_news/indexed_tickers', methods=['GET'])
+def indexed_tickers():
+    res = fetcher.ts.getIndexedTickers()
+    return jsonify(res)
+
+
+# Get tickers indexed in typesense
+@app.route('/search_news/summary', methods=['GET'])
+def summarize():
+    ticker = request.args.get("ticker", default="")
+    if ticker == "":
+        return jsonify({"message": "missing required query param: ticker"}), 400
+    
+    res = fetcher.get_summary(ticker)
+    return jsonify(res)
+
+
 @app.route('/score_news', methods=['GET'])
 def score_news():
-    ticker = request.args.get("ticker")
-    if ticker is None:
+    ticker = request.args.get("ticker", default="")
+    if ticker == "":
         return jsonify({"message": "missing required query param: ticker"}), 400
     
     res = fetcher.score_news(ticker)

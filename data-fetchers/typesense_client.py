@@ -28,7 +28,7 @@ class TypesenseClient:
         return self.client.collections.create({
             "name": "news",
             "fields": [
-                {"name": "ticker", "type": "string" },
+                {"name": "ticker", "type": "string", "facet": True },
                 {"name": "date", "type": "string" },
                 {"name": "title", "type": "string" },
                 {"name": "url", "type": "string" },
@@ -53,6 +53,44 @@ class TypesenseClient:
             condensed = {
                 "num_hits": res["found"], 
                 "urls": [hit["document"]["url"] for hit in res["hits"]]
+            }
+            return condensed
+        except Exception as e:
+            return {"message": f"ERROR {e}"}
+
+    def getIndexedTickers(self):
+        search_parameters = {
+            'q'         : "*",
+            'query_by'  : 'title',
+            'facet_by' : 'ticker',
+            'include_fields': 'ticker',
+            'page': 1,
+            'per_page': 25
+        }
+        try:
+            res = self.client.collections['news'].documents.search(search_parameters)
+            condensed = {
+                "num_hits": res["facet_counts"][0]["stats"]["total_values"], 
+                "tickers": [{"count": hit["count"], "value": hit["value"]} for hit in res["facet_counts"][0]["counts"]]
+            }
+            return condensed
+        except Exception as e:
+            return {"message": f"ERROR {e}"}
+
+    def getScoresByTicker(self, ticker: str):
+        search_parameters = {
+            'q'         : "*",
+            'query_by'  : 'title',
+            'filter_by' : f'ticker:={ticker}',
+            'include_fields': 'date, url, score, magnitude',
+            'page': 1,
+            'per_page': 50
+        }
+        try:
+            res = self.client.collections['news'].documents.search(search_parameters)
+            condensed = {
+                "num_hits": res["found"], 
+                "documents": [hit["document"] for hit in res["hits"]]
             }
             return condensed
         except Exception as e:

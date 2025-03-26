@@ -9,3 +9,4 @@ torch==2.6.0
 transformers==4.49.0
 openpyxl==3.1.2
 Flask==3.1.0
+gunicorn==23.0.0
