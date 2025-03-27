@@ -2,6 +2,7 @@ import fetch_news
 import fetch_utils
 from model_client import ModelClient
 from datastore_client import DatastoreClient
+from auth_client import AuthClient
 from typesense_client import TypesenseClient, NewsDocument
 
 class Fetcher:
@@ -9,6 +10,7 @@ class Fetcher:
     self.ds = DatastoreClient()
     self.ts = TypesenseClient()
     self.model = ModelClient()
+    self.auth = AuthClient()
 
   def scrape_news(self, ticker: str):
     past_5_q = fetch_utils.get_past_8_quarters()[:2]

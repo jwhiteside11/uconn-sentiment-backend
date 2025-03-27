@@ -3,7 +3,7 @@ const PROD_API_URL = "http://34.44.103.189:5100/api";
 const ACTIVE_API_URL = PROD_API_URL;
 
 const updateSummary = (query) => {
-  fetch(`${ACTIVE_API_URL}/search_news/summary?${query}`)
+  fetch(`${ACTIVE_API_URL}/search_news/summary?${query}`, {credentials: 'include'})
   .then(res => res.json() )
   .then(json => {
     console.log(json)

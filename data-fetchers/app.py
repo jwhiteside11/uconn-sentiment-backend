@@ -1,10 +1,28 @@
 from fetcher import Fetcher
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 fetcher = Fetcher()
 fetcher.initTypesenseServer()
 
 app = Flask(__name__)
+
+CORS(app)
+
+@app.before_request
+def before_request():
+    token = request.headers.get("WBS-API-PASSKEY")
+    print("GET THE TOKEN", token)
+    if not token:
+        token = request.cookies.get("WBS-API-PASSKEY")
+        if not token:
+            return jsonify({"message": "Passkey is missing."}), 403
+
+    tokenRes = fetcher.auth.validate_passkey(token)
+    print(tokenRes)
+    if "valid" not in tokenRes or not tokenRes["valid"]:
+        return jsonify({"message": tokenRes["error"]}), 403
+
 
 @app.route('/')
 def hello_world():

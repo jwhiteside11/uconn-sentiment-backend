@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import bcrypt
 import jwt
 import os
@@ -7,6 +8,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import serialization, hashes
 
 app = Flask(__name__)
+CORS(app)
 SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey")
 
 # Generate RSA Key Pair
