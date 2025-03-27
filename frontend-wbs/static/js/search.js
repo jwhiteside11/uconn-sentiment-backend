@@ -36,7 +36,9 @@ const monitorSearchBar = () => {
 }
 
 const updateSearchResults = () => {
-  fetch(`${ACTIVE_API_URL}/search_news?${activeQuery}`, {credentials: 'include'})
+  const headers = {"WBS-API-PASSKEY": getCookie("WBS-API-PASSKEY")}
+  console.log(headers)
+  fetch(`${ACTIVE_API_URL}/search_news?${activeQuery}`, {headers})
   .then(res => res.json() )
   .then(json => {
     console.log(json)

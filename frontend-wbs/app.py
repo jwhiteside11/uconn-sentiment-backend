@@ -38,7 +38,7 @@ def login():
         if "passkey" in loginRes:
             response = make_response(redirect(url_for("search_news")))
             # Set the cookie with name 'my_cookie' and value 'cookie_value'
-            response.set_cookie('WBS-API-PASSKEY', loginRes["passkey"], max_age=3600)
+            response.set_cookie('WBS-API-PASSKEY', loginRes["passkey"], max_age=3600, samesite=None)
             return response
 
     return render_template("login.html")
