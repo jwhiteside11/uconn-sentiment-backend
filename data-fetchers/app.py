@@ -7,7 +7,7 @@ fetcher.initTypesenseServer()
 
 app = Flask(__name__)
 
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=['http://sentiment-test-417820.uc.r.appspot.com'])
 
 @app.before_request
 def before_request():
