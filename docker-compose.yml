@@ -11,8 +11,8 @@ services:
       - ckury
       - fetchers
 
-  auth_service:
-    build: ./auth_server
+  auth:
+    build: ./auth-server
     image: auth_server:latest
     ports:
       - "5200:5200"
