@@ -1,19 +1,23 @@
 services:
-  typesense:
-    image: typesense/typesense:28.0
+  rproxy:
+    build: ./reverse-proxy
+    image: reverse_proxy:latest
     ports:
-      - "8108:8108"
-    volumes:
-      - /tmp/data:/data
-    command: --data-dir /data --api-key=Hu52dwsas2AdxdE
+      - "5100:5100"
     restart: always
+    depends_on:
+      - auth_service
+      - typesense
+      - ckury
+      - fetchers
 
-  ckury:
-    build: ./ckury-services
-    image: model_server:latest
+  auth_service:
+    build: ./auth_server
+    image: auth_server:latest
     ports:
-      - "5400:5400"
-    restart: always
+      - "5200:5200"
+    environment:
+      - SECRET_KEY=supersecretkey
 
   fetchers:
     build: ./data-fetchers
@@ -29,22 +33,19 @@ services:
     #   - GOOGLE_APPLICATION_CREDENTIALS=/gcp/creds.json
     #   - GOOGLE_CLOUD_PROJECT=sentiment-test-417820
     # # REMOVE COMMENTS ABOVE FOR LOCAL DEVELOPMENT #
-  
-  rproxy:
-    build: ./reverse-proxy
-    image: reverse_proxy:latest
-    ports:
-      - "5100:5100"
-    restart: always
-    depends_on:
-      - typesense
-      - ckury
-      - fetchers
 
-  auth_service:
-    build: ./AuthenticationApp
-    image: auth_server:latest
+  ckury:
+    build: ./ckury-services
+    image: model_server:latest
     ports:
-      - "5200:5001"
-    environment:
-      - SECRET_KEY=supersecretkey
+      - "5400:5400"
+    restart: always
+
+  typesense:
+    image: typesense/typesense:28.0
+    ports:
+      - "8108:8108"
+    volumes:
+      - /tmp/data:/data
+    command: --data-dir /data --api-key=Hu52dwsas2AdxdE
+    restart: always

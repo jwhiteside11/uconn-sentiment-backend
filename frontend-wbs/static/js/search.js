@@ -44,7 +44,9 @@ const updateSearchResults = () => {
     console.log(json)
     const elems = []
     json["hits"].forEach(hit => {
-      let outer = document.createElement('div');
+      let outer = document.createElement('a');
+      outer.href = hit["url"]
+      outer.target = "_blank"
       let p1 = document.createElement('h3');
       let p2 = document.createElement('p');
       let p3 = document.createElement('div');

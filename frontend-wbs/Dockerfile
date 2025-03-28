@@ -10,5 +10,4 @@ RUN pip3 install -r requirements.txt
 COPY . /opt/app
  
 # start flask server - use gunicorn in production
-
 CMD [ "gunicorn", "--bind" , "0.0.0.0:8080" , "app:app"]
