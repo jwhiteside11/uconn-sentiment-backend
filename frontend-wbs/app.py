@@ -1,6 +1,5 @@
 from backend_client import BackendClient
 from flask import Flask, jsonify, render_template, request, make_response, redirect, url_for
-import json
 import functools
 
 api_client = BackendClient()
@@ -24,10 +23,13 @@ def passkey_required(f):
     
     return decorated_function
 
+# Base URL - redirect users to login page
 @app.route('/')
-def hello_world():
-    return render_template("hello.html")
+def base():
+    return redirect(url_for('login'))
 
+# Login page - users sign in using username and password
+#   - users get a passkey as a cookie on successful login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     username = request.args.get("username")
@@ -52,7 +54,7 @@ def search_news():
     return render_template("search_news.html", ticker_list=res["tickers"])
 
 
-# Data visualization graphs
+# Data visualization graphs - TODO
 @app.route('/graph_news', methods=['GET'])
 @passkey_required
 def graph():

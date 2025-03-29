@@ -1,14 +1,12 @@
 from fetcher import Fetcher
 from flask import Flask, jsonify, request
-from flask_cors import CORS
 
 fetcher = Fetcher()
 fetcher.initTypesenseServer()
 
 app = Flask(__name__)
 
-# CORS(app)
-
+# Authorization middleware - passkey required on every request
 @app.before_request
 def before_request():
     token = request.headers.get("WBS-API-PASSKEY")
@@ -19,11 +17,11 @@ def before_request():
             return jsonify({"message": "Passkey is missing."}), 403
 
     tokenRes = fetcher.auth.validate_passkey(token)
-    print(tokenRes)
     if "valid" not in tokenRes or not tokenRes["valid"]:
         return jsonify({"message": tokenRes["error"]}), 403
 
 
+# Test endpoint
 @app.route('/')
 def hello_world():
     return jsonify(message="Hello, World!")
@@ -40,6 +38,7 @@ def scrape_news():
     return jsonify({"num_attempts": len(res), "num_success": len([r for r in res if "error" not in r]), "results": res})
 
 
+# Full text search on news articles using ticker and search term
 @app.route('/search_news', methods=['GET'])
 def search_news():
     ticker = request.args.get("ticker", default="")
@@ -48,7 +47,7 @@ def search_news():
     
     search_term = request.args.get("search_term", default="")
 
-    res = fetcher.search_news(ticker, search_term)
+    res = fetcher.ts.searchNews(ticker, search_term)
     return jsonify(res)
 
 
@@ -59,17 +58,18 @@ def indexed_tickers():
     return jsonify(res)
 
 
-# Get tickers indexed in typesense
+# Get all news article scores for a ticker
 @app.route('/search_news/summary', methods=['GET'])
 def summarize():
     ticker = request.args.get("ticker", default="")
     if ticker == "":
         return jsonify({"message": "missing required query param: ticker"}), 400
     
-    res = fetcher.get_summary(ticker)
+    res = fetcher.ts.getScoresByTicker(ticker)
     return jsonify(res)
 
 
+# Score the news stories in Datastore for a ticker, save scores to Datastore
 @app.route('/score_news', methods=['GET'])
 def score_news():
     ticker = request.args.get("ticker", default="")
