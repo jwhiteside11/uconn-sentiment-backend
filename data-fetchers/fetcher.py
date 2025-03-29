@@ -2,6 +2,7 @@ import fetch_news
 import fetch_utils
 from model_client import ModelClient
 from datastore_client import DatastoreClient
+from auth_client import AuthClient
 from typesense_client import TypesenseClient, NewsDocument
 
 class Fetcher:
@@ -9,12 +10,14 @@ class Fetcher:
     self.ds = DatastoreClient()
     self.ts = TypesenseClient()
     self.model = ModelClient()
+    self.auth = AuthClient()
 
+  # Scrape Yahoo Finance news stories from the past 2 quarters
   def scrape_news(self, ticker: str):
-    past_5_q = fetch_utils.get_past_8_quarters()[:2]
+    past_2_q = fetch_utils.get_past_8_quarters()[:2]
 
     results = []
-    for (y, q) in past_5_q:
+    for (y, q) in past_2_q:
       # fetch Yahoo finance urls to scrape
       urls = fetch_news.get_article_urls(ticker, y, q, 25)
       
@@ -52,20 +55,6 @@ class Fetcher:
   def scrape_earnings_calls(self, ticker: str):
     return None
 
-  def get_news(self, ticker: str):
-    return self.ts.getIndexedURLs(ticker)
-
-  def get_summary(self, ticker: str):
-    ticker_res = self.ts.getScoresByTicker(ticker)
-    # if "message" in ticker_res:
-    #   return ticker_res
-    
-    # tickers = ticker_res["tickers"]
-    return ticker_res
-
-  def search_news(self, ticker: str, search_term: str):
-    return self.ts.searchNews(ticker, search_term)
-
   def score_news(self, ticker: str):
       results = []
       urls = self.ds.getAllNewsDocIDs(ticker)
@@ -74,11 +63,14 @@ class Fetcher:
         doc = self.ds.getNewsDocByID(url)
         # score using FinBERT model
         score_res = self.model.score_text('\n'.join(doc.paragraphs))
-        doc.score = score_res["score"]
-        doc.magnitude = score_res["magnitude"]
-        # save document to datastore
-        self.ds.createNewsStoryEntity(doc)
-        results.append({"message": f"SUCCESS {doc.url} score: {doc.score} magnitude: {doc.magnitude}"})
+        if "error" in score_res:
+          results.append({"messsage": f"ERROR {score_res["error"]}"})
+        else:
+          doc.score = score_res["score"]
+          doc.magnitude = score_res["magnitude"]
+          # save document to datastore
+          self.ds.createNewsStoryEntity(doc)
+          results.append({"message": f"SUCCESS {doc.url} score: {doc.score} magnitude: {doc.magnitude}"})
       return results
 
   def backfillTypesenseServer(self, ticker: str):

@@ -3,6 +3,6 @@ services:
   auth_service:
     build: .
     ports:
-      - "5001:5001"
+      - "5200:5200"
     environment:
       - SECRET_KEY=supersecretkey

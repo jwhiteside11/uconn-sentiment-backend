@@ -10,7 +10,7 @@ class ModelClient:
             res = requests.post(f'{self.model_url}/score_text', json={"text_content": text}).json()
             return res
         except Exception as e:
-            return {"message": f"ERROR {e}"}
+            return {"error": f"{e}"}
 
 
 def run_program():

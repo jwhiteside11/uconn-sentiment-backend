@@ -63,12 +63,16 @@ Everything is now up and running. Test the server using the `Hello world!` examp
 curl 'localhost:5100/'
 ```
 
-**Note:** each time the Typesense server is restarted, it must be backfilled with the news we've scraped into datastore. There is an endpoint for doing so.
+**Note:** if the build environment changes, the server must be backfilled with the news we've scraped into datastore. After the first build, the index will be stored in the attached container volume. There is an endpoint for backfilling after the first build.
 ```bash
 curl 'localhost:5100/backfill_typesense'
 ```
 
-&nbsp;
+## Authentication
+
+Every request to `data-fetchers` must provide a valid passkey as a cookie or a header with the key `WBS-API-PASSKEY`. Requests with missing or invalid tokens are returned an error message.
+
+To retrieve a token, one must log in using the `auth-server`. See the [API reference](/auth-server#api-reference) for more info.
 
 # API reference
 This code is wrapped with a Flask server. Interact with this code base using HTTP calls to `localhost:5100`. 
@@ -149,6 +153,34 @@ Search for news using Typesense server.
     }
   ]
 }
+```
+---
+
+### GET /score_news
+
+Score all news stories for a ticker using sentiment model.
+
+#### Request
+- **Method**: GET
+- **URL**: `/score_news`
+
+#### Query Parameters
+| Parameter    | Type   | Description                        |
+|--------------|--------|------------------------------------|
+| `ticker`       | str    | The ticker of the company of interest (required). |
+
+#### Example Request
+`curl 'localhost:5100/score_news?ticker=WBS'`
+
+#### Response
+- **Status Code**: 200 OK
+- **Content-Type**: `application/json`
+
+```json
+[
+  {"message": "SUCCESS https://finance.yahoo.com/news/webster-financial-wbs-q4-earnings-134004111.html score: 0.05226564407348633 magnitude: 7.303900000000001"},
+  {"message": "ERROR <some unexpected system error...>"}
+]
 ```
 ---
 

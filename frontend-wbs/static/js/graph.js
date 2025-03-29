@@ -2,8 +2,19 @@ const DEV_API_URL = "http://localhost:5100/api";
 const PROD_API_URL = "http://34.44.103.189:5100/api";
 const ACTIVE_API_URL = PROD_API_URL;
 
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  
+  if (parts.length === 2) {
+      return parts.pop().split(';').shift();  // Extracts and returns the cookie value
+  }
+  return null;  // Return null if the cookie doesn't exist
+}
+
 const updateSummary = (query) => {
-  fetch(`${ACTIVE_API_URL}/search_news/summary?${query}`)
+  const headers = {"WBS-API-PASSKEY": getCookie("WBS-API-PASSKEY")}
+  fetch(`${ACTIVE_API_URL}/search_news/summary?${query}`, {headers})
   .then(res => res.json() )
   .then(json => {
     console.log(json)

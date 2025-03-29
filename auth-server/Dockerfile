@@ -13,8 +13,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy all application files
 COPY . .
 
-# Expose the correct port
-EXPOSE 5001
-
 # Start the Flask server
-CMD ["python", "flask_auth_server.py"]
+CMD [ "gunicorn", "--bind" , "0.0.0.0:5200" , "app:app"]
